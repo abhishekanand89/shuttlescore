@@ -1,7 +1,8 @@
 """Badminton Scorer — FastAPI Application."""
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.db.database import engine
 from app.db.base import Base
@@ -32,3 +33,12 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api")
 app.include_router(players.router, prefix="/api")
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Transform HTTPException into standard error response format."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "error": exc.detail},
+    )

@@ -1,5 +1,6 @@
 """Shared test configuration and fixtures."""
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 
 # Override database to use in-memory SQLite for tests
@@ -11,7 +12,7 @@ from app.db.database import engine  # noqa: E402
 from app.db.base import Base  # noqa: E402
 
 
-@pytest.fixture(autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def setup_db():
     """Create tables before each test, drop after."""
     async with engine.begin() as conn:
@@ -21,7 +22,7 @@ async def setup_db():
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     """Provide an async HTTP test client."""
     async with AsyncClient(
@@ -30,7 +31,7 @@ async def client():
         yield c
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def sample_player(client: AsyncClient):
     """Create and return a sample player."""
     response = await client.post(
