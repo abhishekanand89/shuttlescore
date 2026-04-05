@@ -1,0 +1,95 @@
+.players-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.player-count {
+  background: var(--color-primary);
+  color: white;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  min-width: 28px;
+  text-align: center;
+}
+
+.search-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+  background: var(--color-bg);
+  padding: var(--space-xs) 0;
+}
+
+.search-input {
+  background: var(--color-surface);
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Loading skeleton */
+.skeleton-card {
+  height: 76px;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-surface-hover) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Error state */
+.error-state {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--color-error);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: calc(72px + var(--space-md) + env(safe-area-inset-bottom, 0px));
+  right: var(--space-md);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.fab:hover {
+  transform: scale(1.1);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
