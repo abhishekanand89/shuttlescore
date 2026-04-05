@@ -19,7 +19,7 @@ async def create_match(db: AsyncSession, data: MatchCreate) -> Match:
     if data.match_type == "doubles" and (len(data.team_a_player_ids) != 2 or len(data.team_b_player_ids) != 2):
         raise ValueError("Doubles requires exactly 2 players per team")
 
-    all_ids = data.team_a_player_ids + data.team_b_player_ids
+    all_ids = list(set(data.team_a_player_ids + data.team_b_player_ids))
     if data.first_server_id not in all_ids:
         raise ValueError("First server must be a participating player")
 

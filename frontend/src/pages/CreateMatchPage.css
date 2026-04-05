@@ -76,11 +76,10 @@
 
 .floating-action-bar {
   position: fixed;
-  bottom: 0;
+  bottom: 72px; /* Set above layout nav */
   left: 0;
   right: 0;
   padding: var(--space-md);
-  padding-bottom: max(var(--space-md), env(safe-area-inset-bottom));
   background: linear-gradient(to top, var(--color-bg) 60%, transparent);
   display: flex;
   justify-content: center;

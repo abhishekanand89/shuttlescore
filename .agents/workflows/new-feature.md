@@ -164,7 +164,7 @@ git add -A
 git commit -m "[test] FEAT-XXX: Test evidence — X/Y passing"
 ```
 
-**Update audit log** with Test Agent action.
+**Final action for Test Agent**: Proceed to Step 10.
 
 ### Failure Routing (if tests fail)
 
@@ -185,12 +185,25 @@ If any tests fail, follow the Orchestrator's Failure Routing Protocol:
 Present to the user:
 - Test summary table from `test-evidence/summary.md`
 - Overall pass/fail status
-- Ask: "Tests are passing. Approve merge to main? (yes/no)"
+- Ask: "Tests are passing. Proceed to Docker build / CI testing? (yes/no)"
 
 **If no**: User provides feedback; route to appropriate agent.
 **If yes**: Continue to Step 11.
 
-## Step 11: Merge & Archive
+## Step 11: CI/CD Packaging & Deployment
+
+**Orchestrator Actions**:
+1. Run `docker build -t badminton-scorer:latest .`
+2. Run `docker run -d -p 8000:8000 --name badminton-test badminton-scorer:latest`
+3. Wait 5 seconds, then stop and present to user:
+4. "The application is running in a Docker container at http://localhost:8000. Please test the containerized app. Let me know when you are done to tear it down and merge to main."
+
+Once the user approves tracking destruction:
+1. Run `docker stop badminton-test && docker rm badminton-test`
+2. Remove any local temporary artifacts.
+3. Continue to Step 12.
+
+## Step 12: Merge & Archive
 
 ```bash
 # Merge feature branch
@@ -210,7 +223,7 @@ git branch -d feat/FEAT-XXX-<slug>
 
 **Final audit log entry**: Record merge commit SHA and timestamp.
 
-## Step 12: Update Project Manifest (if needed)
+## Step 13: Update Project Manifest (if needed)
 
 If this feature introduced new architectural patterns, key abstractions, or changed the tech stack:
 - Update `PROJECT_MANIFEST.md` accordingly

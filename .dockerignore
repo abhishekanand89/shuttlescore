@@ -1,0 +1,15 @@
+node_modules
+dist
+.vscode
+.idea
+.git
+.gitignore
+*.md
+backend/venv
+backend/.venv
+backend/__pycache__
+backend/.pytest_cache
+*.db
+*.sqlite3
+frontend/dist
+.feature-tracking
