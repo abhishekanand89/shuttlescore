@@ -15,6 +15,7 @@ class Match(Base):
     team_b_player_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     current_game_number: Mapped[int] = mapped_column(Integer, default=1)
     winner_side: Mapped[Optional[str]] = mapped_column(String(10), nullable=True) # "a" or "b"
+    tournament_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("tournaments.id"), nullable=True)
     
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
@@ -25,6 +26,7 @@ class Match(Base):
 
     games = relationship("GameResult", back_populates="match", cascade="all, delete-orphan", lazy="selectin")
     points = relationship("Point", back_populates="match", cascade="all, delete-orphan", lazy="selectin", order_by="Point.id")
+    tournament = relationship("Tournament", back_populates="matches")
 
 class GameResult(Base):
     __tablename__ = "game_results"

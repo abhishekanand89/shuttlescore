@@ -86,7 +86,40 @@ export const playerApi = {
     }),
 };
 
+/* --- Tournament API --- */
+
+export const tournamentApi = {
+  list: (status?: string) =>
+    request<TournamentData[]>(`/tournaments${status ? `?status=${status}` : ""}`),
+  get: (id: string) => request<{tournament: TournamentData}>(`/tournaments/${id}`),
+  create: (data: CreateTournamentData) =>
+    request<TournamentData>("/tournaments", { method: "POST", body: JSON.stringify(data) }),
+};
+
 /* --- Match Types --- */
+
+export interface PointData {
+  scoring_side: "a" | "b" | "start";
+  game_number: number;
+  score_a_after: number;
+  score_b_after: number;
+  server_id: string;
+}
+
+/* --- Tournament Types --- */
+export interface TournamentData {
+  id: string;
+  name: string;
+  description?: string;
+  status: "upcoming" | "active" | "completed";
+  created_at: string;
+}
+
+export interface CreateTournamentData {
+  name: string;
+  description?: string;
+  status: string;
+}
 
 export interface GameState {
   game_number: number;
@@ -106,6 +139,7 @@ export interface MatchData {
   games: any[];
   points: any[];
   winner_side?: "a" | "b" | null;
+  tournament_id?: string;
   created_at: string;
   current_score?: {a: number, b: number};
 }
@@ -119,6 +153,7 @@ export interface CreateMatchData {
   team_a_player_ids: string[];
   team_b_player_ids: string[];
   first_server_id: string;
+  tournament_id?: string;
 }
 
 /* --- Match API --- */

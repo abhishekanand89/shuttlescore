@@ -40,8 +40,16 @@ export default function Layout() {
           </NavLink>
         ))}
         <NavLink
+            to="/tournaments"
+            className={({ isActive }) => `nav-item ${isActive || location.pathname.startsWith('/tournaments') ? "nav-item--active" : ""}`}
+            id="nav-tournaments"
+          >
+            <span className="nav-icon" aria-hidden="true">🏆</span>
+            <span className="nav-label">Tournaments</span>
+          </NavLink>
+        <NavLink
           to="/matches"
-          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          className={({ isActive }) => `nav-item ${isActive || location.pathname.startsWith('/matches') ? "nav-item--active" : ""}`}
           id="nav-matches"
         >
           <span className="nav-icon" aria-hidden="true">

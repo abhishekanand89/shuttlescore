@@ -35,6 +35,7 @@ async def _build_match_response(db: AsyncSession, match) -> dict:
         "games": [{"game_number": g.game_number, "score_a": g.score_a, "score_b": g.score_b, "winner_side": g.winner_side} for g in match.games],
         "points": [p for p in match.points if p.scoring_side != "start"],
         "winner_side": match.winner_side,
+        "tournament_id": match.tournament_id,
         "created_at": match.created_at
     }
 
@@ -48,8 +49,8 @@ async def create_match(data: MatchCreate, db: AsyncSession = Depends(get_db)):
     return {"success": True, "data": await _build_match_response(db, match)}
 
 @router.get("/matches")
-async def list_matches(db: AsyncSession = Depends(get_db)):
-    matches = await match_service.list_matches(db)
+async def list_matches(tournament_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    matches = await match_service.list_matches(db, tournament_id)
     items = []
     
     for match in matches:
@@ -72,6 +73,7 @@ async def list_matches(db: AsyncSession = Depends(get_db)):
             },
             "current_score": {"a": state.current_game.score_a, "b": state.current_game.score_b} if state.current_game else None,
             "winner_side": match.winner_side,
+            "tournament_id": match.tournament_id,
             "created_at": match.created_at
         })
         

@@ -8,6 +8,7 @@ class MatchCreate(BaseModel):
     team_a_player_ids: List[str]
     team_b_player_ids: List[str]
     first_server_id: str
+    tournament_id: Optional[str] = Field(None, description="Optional association with a tournament")
 
 class GameStateBase(BaseModel):
     game_number: int
@@ -46,6 +47,7 @@ class MatchResponse(BaseModel):
     games: List[GameResultBase]
     points: List[PointBase]
     winner_side: Optional[str]
+    tournament_id: Optional[str]
     created_at: datetime
     model_config = {"from_attributes": True}
 
@@ -72,4 +74,5 @@ class MatchListItem(BaseModel):
     team_b: dict
     current_score: Optional[dict]
     winner_side: Optional[str]
+    tournament_id: Optional[str]
     created_at: datetime

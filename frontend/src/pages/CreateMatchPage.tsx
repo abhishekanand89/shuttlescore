@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { playerApi, matchApi } from "../api/client";
+import { playerApi, matchApi, tournamentApi } from "../api/client";
 import "./CreateMatchPage.css";
 
 export default function CreateMatchPage() {
   const navigate = useNavigate();
   const { data: players } = useApi(() => playerApi.list());
+  const { data: activeTournaments } = useApi(() => tournamentApi.list("active"));
   
   const [matchType, setMatchType] = useState<"singles" | "doubles">("singles");
   const [teamA, setTeamA] = useState<string[]>([]);
   const [teamB, setTeamB] = useState<string[]>([]);
   const [server, setServer] = useState<string>("");
+  const [tournamentId, setTournamentId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,6 +50,7 @@ export default function CreateMatchPage() {
         team_a_player_ids: teamA,
         team_b_player_ids: teamB,
         first_server_id: server,
+        tournament_id: tournamentId || undefined,
       });
       navigate(`/matches/${res.id}`);
     } catch (err: any) {
@@ -146,6 +149,24 @@ export default function CreateMatchPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Tournament Linkage */}
+      {activeTournaments && activeTournaments.length > 0 && (
+        <div className="tournament-selector animate-slide-up" style={{ marginBottom: "16px", background: "var(--color-surface)", padding: "16px", borderRadius: "12px", border: "1px solid var(--color-border)" }}>
+          <h3 className="section-title" style={{ fontSize: "14px", marginTop: "0", marginBottom: "12px" }}>Link to Tournament (Optional)</h3>
+          <select 
+            className="input" 
+            value={tournamentId} 
+            onChange={(e) => setTournamentId(e.target.value)}
+            style={{ width: "100%", padding: "12px", background: "var(--color-bg-secondary)" }}
+          >
+            <option value="">None (Free Play)</option>
+            {activeTournaments.map(t => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="floating-action-bar">
         <button
