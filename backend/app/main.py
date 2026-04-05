@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.db.database import engine
 from app.db.base import Base
-from app.api import health, players
+from app.api import health, players, matches
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api")
 app.include_router(players.router, prefix="/api")
+app.include_router(matches.router, prefix="/api")
 
 
 @app.exception_handler(HTTPException)

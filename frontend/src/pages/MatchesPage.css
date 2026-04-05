@@ -1,0 +1,86 @@
+.matches-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-bottom: 80px; /* space for fab */
+}
+
+.match-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.match-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-xs);
+}
+
+.match-badge {
+  font-weight: var(--font-weight-bold);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.match-badge--in_progress {
+  background: rgba(234, 67, 53, 0.15);
+  color: var(--color-error);
+}
+
+.match-badge--completed {
+  background: var(--color-surface-active);
+  color: var(--color-text-secondary);
+}
+
+.match-type {
+  font-weight: var(--font-weight-medium);
+}
+
+.team-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  padding: var(--space-xs) 0;
+}
+
+.team-winner .team-names {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-light);
+}
+
+.team-names {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: var(--space-md);
+}
+
+.team-score {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+.team-divider {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  margin: 2px 0;
+}

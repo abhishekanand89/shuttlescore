@@ -1,0 +1,95 @@
+.create-match-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-bottom: 100px; /* For floating action bar */
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.match-type-toggle {
+  display: flex;
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+  padding: 4px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: var(--space-sm) 0;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.toggle-btn.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.teams-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.team-title {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-sm);
+}
+
+.text-a { color: var(--color-primary-light); }
+.text-b { color: var(--color-accent); }
+
+.player-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.player-chip {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+.player-chip.selected {
+  border-color: transparent;
+  color: white;
+}
+
+.bg-primary { background: var(--color-primary); }
+.bg-accent { background: var(--color-accent-dark); }
+.border-active { border: 2px solid white; background: var(--color-surface-active); }
+
+.floating-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-md);
+  padding-bottom: max(var(--space-md), env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--color-bg) 60%, transparent);
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+}
+
+.start-match-btn {
+  width: 100%;
+  max-width: 400px;
+  font-size: var(--font-size-base);
+  padding: var(--space-md);
+}

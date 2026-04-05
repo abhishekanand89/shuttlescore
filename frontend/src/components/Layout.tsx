@@ -39,11 +39,16 @@ export default function Layout() {
             <span className="nav-label">{item.label}</span>
           </NavLink>
         ))}
-        {/* Match tab — present but disabled until FEAT-002 */}
-        <span className="nav-item nav-item--disabled" id="nav-matches">
-          <span className="nav-icon">🏆</span>
+        <NavLink
+          to="/matches"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+          id="nav-matches"
+        >
+          <span className="nav-icon" aria-hidden="true">
+            🏸
+          </span>
           <span className="nav-label">Matches</span>
-        </span>
+        </NavLink>
       </nav>
     </div>
   );
