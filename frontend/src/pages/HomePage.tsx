@@ -1,12 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { playerApi } from "../api/client";
+import { playerApi, matchApi } from "../api/client";
 import "./HomePage.css";
 
 export default function HomePage() {
   const { data: players } = useApi(() => playerApi.list(), []);
+  const { data: matches } = useApi(() => matchApi.list(), []);
   const navigate = useNavigate();
   const playerCount = players?.length ?? 0;
+  const matchCount = matches?.length ?? 0;
 
   return (
     <div className="home-page animate-fade-in">
@@ -22,7 +24,7 @@ export default function HomePage() {
           <span className="stat-label">Players</span>
         </div>
         <div className="stat-card card">
-          <span className="stat-value">—</span>
+          <span className="stat-value">{matchCount}</span>
           <span className="stat-label">Matches</span>
         </div>
         <div className="stat-card card">
@@ -43,13 +45,12 @@ export default function HomePage() {
             <span className="action-label">Manage Players</span>
           </button>
           <button
-            className="action-card card action-card--disabled"
-            disabled
+            className="action-card card"
+            onClick={() => navigate("/matches/new")}
             id="action-new-match"
           >
             <span className="action-icon">🏆</span>
             <span className="action-label">New Match</span>
-            <span className="action-badge">Soon</span>
           </button>
         </div>
       </section>

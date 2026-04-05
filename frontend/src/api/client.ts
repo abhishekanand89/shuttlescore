@@ -86,6 +86,59 @@ export const playerApi = {
     }),
 };
 
+/* --- Match Types --- */
+
+export interface GameState {
+  game_number: number;
+  score_a: number;
+  score_b: number;
+  server_id: string;
+  serving_side: "a" | "b";
+}
+
+export interface MatchData {
+  id: string;
+  match_type: "singles" | "doubles";
+  status: "in_progress" | "completed";
+  team_a: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
+  team_b: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
+  current_game?: GameState;
+  games: any[];
+  points: any[];
+  winner_side?: "a" | "b" | null;
+  created_at: string;
+  current_score?: {a: number, b: number};
+}
+
+export interface ActiveMatchListItem extends MatchData {
+  current_score: {a: number, b: number};
+}
+
+export interface CreateMatchData {
+  match_type: "singles" | "doubles";
+  team_a_player_ids: string[];
+  team_b_player_ids: string[];
+  first_server_id: string;
+}
+
+/* --- Match API --- */
+
+export const matchApi = {
+  list: (status?: string) =>
+    request<MatchData[]>(`/matches${status ? `?status=${status}` : ""}`),
+  get: (id: string) => request<MatchData>(`/matches/${id}`),
+  create: (data: CreateMatchData) =>
+    request<MatchData>("/matches", { method: "POST", body: JSON.stringify(data) }),
+  scorePoint: (id: string, side: "a" | "b") =>
+    request<{point: any, current_game: GameState, game_ended: boolean, match_ended: boolean, winner_side: string}>(
+      `/matches/${id}/points`, { method: "POST", body: JSON.stringify({ scoring_side: side }) }
+    ),
+  undoPoint: (id: string) =>
+    request<{undone: boolean, current_game: GameState, game_restored: boolean}>(
+      `/matches/${id}/undo`, { method: "POST" }
+    )
+};
+
 /* --- Health API --- */
 
 export const healthApi = {
