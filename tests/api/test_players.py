@@ -1,35 +1,6 @@
 """API tests for player CRUD endpoints."""
 import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
-from app.db.database import get_db, engine
-from app.db.base import Base
-
-
-@pytest.fixture(autouse=True)
-async def setup_db():
-    """Create tables before each test, drop after."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-
-
-@pytest.fixture
-async def client():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
-        yield c
-
-
-@pytest.fixture
-async def sample_player(client: AsyncClient):
-    """Create and return a sample player."""
-    response = await client.post("/api/players", json={
-        "name": "John Doe",
-        "phone": "9876543210"
-    })
-    return response.json()["data"]
+from httpx import AsyncClient
 
 
 # --- AC-1: Player Registration ---

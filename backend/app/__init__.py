@@ -1,0 +1,1 @@
+"""Badminton Scorer app package."""
