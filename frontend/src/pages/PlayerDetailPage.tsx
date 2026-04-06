@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { playerApi, analyticsApi, TournamentMedal } from "../api/client";
+import { playerApi, analyticsApi } from "../api/client";
+import type { TournamentMedal } from "../api/client";
 import "./PlayerDetailPage.css";
 
 const MEDAL_ICONS: Record<string, string> = {

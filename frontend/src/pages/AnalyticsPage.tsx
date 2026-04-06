@@ -1,13 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { analyticsApi, LeaderboardEntry } from "../api/client";
+import { analyticsApi } from "../api/client";
+import type { LeaderboardEntry } from "../api/client";
 import "./AnalyticsPage.css";
-
-const MEDAL_ICONS: Record<string, string> = {
-  gold: "🥇",
-  silver: "🥈",
-  bronze: "🥉",
-};
 
 function WinRateBar({ rate }: { rate: number }) {
   return (
