@@ -3,12 +3,17 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
+VALID_TRACKING_LEVELS = {"summary", "sequence", "detailed"}
+VALID_END_REASONS = {"winner", "unforced_error", "forced_error", "serve_error", "net_error", "line_out"}
+VALID_SHOT_TYPES = {"smash", "drop", "clear", "lob", "drive", "net_shot", "serve", "flick", "push", "lift"}
+
 class MatchCreate(BaseModel):
     match_type: str = Field(..., description="'singles' or 'doubles'")
     team_a_player_ids: List[str]
     team_b_player_ids: List[str]
     first_server_id: str
     tournament_id: Optional[str] = Field(None, description="Optional association with a tournament")
+    tracking_level: str = Field("sequence", description="'summary' | 'sequence' | 'detailed'")
 
 class GameStateBase(BaseModel):
     game_number: int
@@ -31,6 +36,10 @@ class PointBase(BaseModel):
     score_b_after: int
     server_id: str
     timestamp: datetime = Field(..., alias="created_at")
+    rally_duration_seconds: Optional[int] = None
+    point_end_reason: Optional[str] = None
+    shot_type: Optional[str] = None
+    winning_player_id: Optional[str] = None
     model_config = {"from_attributes": True, "populate_by_name": True}
 
 class TeamBase(BaseModel):
@@ -41,6 +50,7 @@ class MatchResponse(BaseModel):
     id: str
     match_type: str
     status: str
+    tracking_level: str
     team_a: TeamBase
     team_b: TeamBase
     current_game: Optional[GameStateBase]
@@ -65,6 +75,22 @@ class UndoResponse(BaseModel):
     undone_point: dict
     current_game: Optional[GameStateBase]
     game_restored: bool
+
+class PointMetadataUpdate(BaseModel):
+    rally_duration_seconds: Optional[int] = None
+    point_end_reason: Optional[str] = None
+    shot_type: Optional[str] = None
+    winning_player_id: Optional[str] = None
+
+
+class GameScoreInput(BaseModel):
+    score_a: int
+    score_b: int
+
+
+class MatchSummarySubmit(BaseModel):
+    games: List[GameScoreInput]
+
 
 class MatchListItem(BaseModel):
     id: str

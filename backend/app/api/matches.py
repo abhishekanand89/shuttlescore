@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from app.db.database import get_db
 from app.models.player import Player
-from app.schemas.match import MatchCreate, MatchScoreUpdate, MatchResponse, MatchListItem, PointResponse, UndoResponse
+from app.schemas.match import MatchCreate, MatchScoreUpdate, MatchResponse, MatchListItem, PointResponse, UndoResponse, PointMetadataUpdate, MatchSummarySubmit
 from app.services import match_service
 
 router = APIRouter(tags=["matches"])
@@ -19,10 +19,26 @@ async def _build_match_response(db: AsyncSession, match) -> dict:
     result = await db.execute(select(Player).where(Player.id.in_(all_player_ids)))
     players = {p.id: p for p in result.scalars().all()}
     
+    def _serialize_point(p) -> dict:
+        return {
+            "id": p.id,
+            "scoring_side": p.scoring_side,
+            "game_number": p.game_number,
+            "score_a_after": p.score_a_after,
+            "score_b_after": p.score_b_after,
+            "server_id": p.server_id,
+            "created_at": p.created_at,
+            "rally_duration_seconds": p.rally_duration_seconds,
+            "point_end_reason": p.point_end_reason,
+            "shot_type": p.shot_type,
+            "winning_player_id": p.winning_player_id,
+        }
+
     return {
         "id": match.id,
         "match_type": match.match_type,
         "status": match.status,
+        "tracking_level": match.tracking_level,
         "team_a": {
             "players": [{"id": p, "name": players[p].name} for p in match.team_a_player_ids if p in players],
             "games_won": state.games_won_a
@@ -33,7 +49,7 @@ async def _build_match_response(db: AsyncSession, match) -> dict:
         },
         "current_game": state.current_game.__dict__ if state.current_game else None,
         "games": [{"game_number": g.game_number, "score_a": g.score_a, "score_b": g.score_b, "winner_side": g.winner_side} for g in match.games],
-        "points": [p for p in match.points if p.scoring_side != "start"],
+        "points": [_serialize_point(p) for p in match.points if p.scoring_side != "start"],
         "winner_side": match.winner_side,
         "tournament_id": match.tournament_id,
         "created_at": match.created_at
@@ -107,6 +123,41 @@ async def score_point(match_id: str, data: MatchScoreUpdate, db: AsyncSession = 
             "winner_side": match.winner_side
         }
     }
+
+@router.patch("/matches/{match_id}/points/{point_id}")
+async def update_point_metadata(
+    match_id: str, point_id: int, data: PointMetadataUpdate, db: AsyncSession = Depends(get_db)
+):
+    """Add or update optional metadata on a recorded point (detailed mode, retroactive allowed)."""
+    try:
+        point = await match_service.update_point_metadata(db, match_id, point_id, data)
+    except ValueError as e:
+        status = 404 if "not found" in str(e).lower() else 400
+        raise HTTPException(status_code=status, detail=str(e))
+
+    return {
+        "success": True,
+        "data": {
+            "id": point.id,
+            "rally_duration_seconds": point.rally_duration_seconds,
+            "point_end_reason": point.point_end_reason,
+            "shot_type": point.shot_type,
+            "winning_player_id": point.winning_player_id,
+        },
+    }
+
+
+@router.post("/matches/{match_id}/summary")
+async def submit_match_summary(match_id: str, data: MatchSummarySubmit, db: AsyncSession = Depends(get_db)):
+    """Submit final game scores for a summary-mode match, completing it immediately."""
+    try:
+        match = await match_service.submit_match_summary(db, match_id, data)
+    except ValueError as e:
+        status = 404 if "not found" in str(e).lower() else 400
+        raise HTTPException(status_code=status, detail=str(e))
+
+    return {"success": True, "data": await _build_match_response(db, match)}
+
 
 @router.post("/matches/{match_id}/undo")
 async def undo_point(match_id: str, db: AsyncSession = Depends(get_db)):

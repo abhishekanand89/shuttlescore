@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import { playerApi, matchApi, tournamentApi } from "../api/client";
+import type { TrackingLevel } from "../api/client";
 import "./CreateMatchPage.css";
 
 export default function CreateMatchPage() {
@@ -14,6 +15,7 @@ export default function CreateMatchPage() {
   const [teamB, setTeamB] = useState<string[]>([]);
   const [server, setServer] = useState<string>("");
   const [tournamentId, setTournamentId] = useState<string>("");
+  const [trackingLevel, setTrackingLevel] = useState<TrackingLevel>("sequence");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,8 +53,13 @@ export default function CreateMatchPage() {
         team_b_player_ids: teamB,
         first_server_id: server,
         tournament_id: tournamentId || undefined,
+        tracking_level: trackingLevel,
       });
-      navigate(`/matches/${res.id}`);
+      if (trackingLevel === "summary") {
+        navigate(`/matches/${res.id}/summary`);
+      } else {
+        navigate(`/matches/${res.id}`);
+      }
     } catch (err: any) {
       setError(err.message);
       setLoading(false);
@@ -167,6 +174,27 @@ export default function CreateMatchPage() {
           </select>
         </div>
       )}
+
+      {/* Tracking level */}
+      <div className="tracking-selector animate-slide-up">
+        <h3 className="section-title">Tracking Mode</h3>
+        <div className="tracking-options">
+          {([
+            { value: "summary", label: "Summary", desc: "Enter final scores only" },
+            { value: "sequence", label: "Point by Point", desc: "Tap to record each rally" },
+            { value: "detailed", label: "Detailed", desc: "Per-point: shot type, time & more" },
+          ] as const).map(opt => (
+            <button
+              key={opt.value}
+              className={`tracking-option ${trackingLevel === opt.value ? "tracking-option--active" : ""}`}
+              onClick={() => setTrackingLevel(opt.value)}
+            >
+              <span className="tracking-option-label">{opt.label}</span>
+              <span className="tracking-option-desc">{opt.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="floating-action-bar">
         <button

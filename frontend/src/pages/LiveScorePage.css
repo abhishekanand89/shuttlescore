@@ -141,6 +141,107 @@
   background: linear-gradient(to bottom, var(--color-accent), var(--color-accent-dark));
 }
 
+/* Rally timer */
+.rally-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.rally-timer-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rally-timer-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-feature-settings: "tnum";
+  color: var(--color-primary-light, #6ca9f0);
+  min-width: 40px;
+}
+
+/* Point history */
+.point-history {
+  margin-top: var(--space-lg);
+  border-top: 1px solid var(--color-border, rgba(255,255,255,0.08));
+  padding-top: var(--space-sm);
+}
+
+.history-toggle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  padding: var(--space-xs) 0;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--space-xs);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.history-row:hover {
+  background: var(--color-surface-hover, rgba(255,255,255,0.05));
+}
+
+.history-side {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+.history-side--a { background: var(--color-primary); color: white; }
+.history-side--b { background: var(--color-accent, #ff6b35); color: white; }
+
+.history-score {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-feature-settings: "tnum";
+  min-width: 40px;
+}
+
+.history-meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-add-hint {
+  color: var(--color-primary-light, #6ca9f0);
+  opacity: 0.7;
+}
+
 .match-winner-banner {
   background: var(--color-surface-active);
   border: 1px solid var(--color-primary-light);
