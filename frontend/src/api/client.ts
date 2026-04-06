@@ -163,6 +163,7 @@ export interface GameScoreInput {
 export interface MatchData {
   id: string;
   match_type: "singles" | "doubles";
+  match_format: "bo1" | "bo3";
   status: "in_progress" | "completed";
   tracking_level: TrackingLevel;
   team_a: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
@@ -182,6 +183,7 @@ export interface ActiveMatchListItem extends MatchData {
 
 export interface CreateMatchData {
   match_type: "singles" | "doubles";
+  match_format?: "bo1" | "bo3";
   team_a_player_ids: string[];
   team_b_player_ids: string[];
   first_server_id: string;
@@ -257,6 +259,30 @@ export interface LeaderboardEntry {
   wins: number;
   losses: number;
   win_rate: number;
+  avg_rally_duration_seconds: number | null;
+}
+
+export interface ShotBreakdown {
+  shot_type: string;
+  label: string;
+  count: number;
+  wins: number;
+  win_rate: number;
+}
+
+export interface EndReasonBreakdown {
+  reason: string;
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface ShotAnalytics {
+  total_detailed_points: number;
+  avg_rally_duration_seconds: number | null;
+  shots: ShotBreakdown[];
+  end_reasons: EndReasonBreakdown[];
+  serve_error_rate: number | null;
 }
 
 /* --- Analytics API --- */
@@ -265,6 +291,8 @@ export const analyticsApi = {
   getPlayerStats: (playerId: string) =>
     request<PlayerAnalytics>(`/analytics/players/${playerId}`),
   getLeaderboard: () => request<LeaderboardEntry[]>("/analytics/leaderboard"),
+  getPlayerShots: (playerId: string) =>
+    request<ShotAnalytics>(`/analytics/players/${playerId}/shots`),
 };
 
 /* --- Health API --- */

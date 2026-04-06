@@ -35,6 +35,11 @@ function LeaderboardRow({
         <span className="lb-winrate-pct">{Math.round(entry.win_rate * 100)}%</span>
         <WinRateBar rate={entry.win_rate} />
       </div>
+      <span className="lb-rally">
+        {entry.avg_rally_duration_seconds != null
+          ? `${entry.avg_rally_duration_seconds}s`
+          : "—"}
+      </span>
     </button>
   );
 }
@@ -83,6 +88,7 @@ export default function AnalyticsPage() {
             <span>Player</span>
             <span>W / L</span>
             <span>Win Rate</span>
+            <span>Avg Rally</span>
           </div>
           {leaderboard.map((entry) => (
             <LeaderboardRow

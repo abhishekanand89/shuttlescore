@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import { playerApi, matchApi, tournamentApi } from "../api/client";
 import type { TrackingLevel } from "../api/client";
+type MatchFormat = "bo1" | "bo3";
 import "./CreateMatchPage.css";
 
 export default function CreateMatchPage() {
@@ -16,6 +17,7 @@ export default function CreateMatchPage() {
   const [server, setServer] = useState<string>("");
   const [tournamentId, setTournamentId] = useState<string>("");
   const [trackingLevel, setTrackingLevel] = useState<TrackingLevel>("sequence");
+  const [matchFormat, setMatchFormat] = useState<MatchFormat>("bo3");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +51,7 @@ export default function CreateMatchPage() {
     try {
       const res = await matchApi.create({
         match_type: matchType,
+        match_format: matchFormat,
         team_a_player_ids: teamA,
         team_b_player_ids: teamB,
         first_server_id: server,
@@ -89,6 +92,21 @@ export default function CreateMatchPage() {
           onClick={() => { setMatchType("doubles"); setTeamA([]); setTeamB([]); setServer(""); }}
         >
           Doubles
+        </button>
+      </div>
+
+      <div className="match-type-toggle" style={{ marginBottom: "8px" }}>
+        <button
+          className={`toggle-btn ${matchFormat === "bo1" ? "active" : ""}`}
+          onClick={() => setMatchFormat("bo1")}
+        >
+          1 Game
+        </button>
+        <button
+          className={`toggle-btn ${matchFormat === "bo3" ? "active" : ""}`}
+          onClick={() => setMatchFormat("bo3")}
+        >
+          Best of 3
         </button>
       </div>
 

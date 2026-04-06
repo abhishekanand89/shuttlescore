@@ -29,7 +29,7 @@
 
 .lb-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 80px 90px;
+  grid-template-columns: 48px 1fr 80px 90px 60px;
   gap: var(--space-sm);
   padding: 0 var(--space-md);
   font-size: var(--font-size-xs);
@@ -40,7 +40,7 @@
 
 .lb-row {
   display: grid;
-  grid-template-columns: 48px 1fr 80px 90px;
+  grid-template-columns: 48px 1fr 80px 90px 60px;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md);
@@ -87,6 +87,13 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-primary-light, #6ca9f0);
+}
+
+.lb-rally {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: right;
+  font-feature-settings: "tnum";
 }
 
 .winrate-bar {

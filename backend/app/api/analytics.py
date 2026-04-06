@@ -17,6 +17,15 @@ async def get_player_analytics(player_id: str, db: AsyncSession = Depends(get_db
     return {"success": True, "data": analytics.model_dump()}
 
 
+@router.get("/analytics/players/{player_id}/shots")
+async def get_player_shot_analytics(player_id: str, db: AsyncSession = Depends(get_db)):
+    """Get shot type breakdown, end reasons, rally duration, and serve error rate."""
+    shot_analytics = await analytics_service.get_player_shot_analytics(db, player_id)
+    if shot_analytics is None:
+        raise HTTPException(status_code=404, detail="Player not found")
+    return {"success": True, "data": shot_analytics.model_dump()}
+
+
 @router.get("/analytics/leaderboard")
 async def get_leaderboard(db: AsyncSession = Depends(get_db)):
     """Get all players ranked by wins."""

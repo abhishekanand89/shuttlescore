@@ -9,7 +9,8 @@ class Match(Base):
     __tablename__ = "matches"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    match_type: Mapped[str] = mapped_column(String(20), nullable=False) # "singles" or "doubles"
+    match_type: Mapped[str] = mapped_column(String(20), nullable=False)   # "singles" | "doubles"
+    match_format: Mapped[str] = mapped_column(String(10), default="bo3") # "bo1" | "bo3"
     status: Mapped[str] = mapped_column(String(20), default="in_progress")
     tracking_level: Mapped[str] = mapped_column(String(20), default="sequence")  # "summary" | "sequence" | "detailed"
     team_a_player_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False)

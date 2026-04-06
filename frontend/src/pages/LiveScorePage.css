@@ -141,7 +141,26 @@
   background: linear-gradient(to bottom, var(--color-accent), var(--color-accent-dark));
 }
 
+.start-rally-btn {
+  grid-column: 1 / -1;
+  background: linear-gradient(to bottom, #2d7a3a, #1f5929);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.5px;
+}
+
+.start-rally-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
 /* Rally timer */
+.rally-timer--paused .rally-timer-value {
+  color: var(--color-text-secondary);
+}
+
+.rally-timer--paused .rally-timer-label {
+  color: var(--color-text-muted, var(--color-text-secondary));
+}
+
 .rally-timer {
   display: flex;
   align-items: center;

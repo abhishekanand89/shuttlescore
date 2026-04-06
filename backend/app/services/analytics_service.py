@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.match import Match, GameResult
+from app.models.match import Match, GameResult, Point
 from app.models.player import Player
 from app.models.tournament import Tournament
 from app.schemas.analytics import (
@@ -14,6 +14,11 @@ from app.schemas.analytics import (
     TournamentStats,
     TournamentMedal,
     LeaderboardEntry,
+    ShotAnalytics,
+    ShotBreakdown,
+    EndReasonBreakdown,
+    SHOT_LABELS,
+    END_REASON_LABELS,
 )
 
 
@@ -130,9 +135,11 @@ async def get_leaderboard(db: AsyncSession) -> List[LeaderboardEntry]:
     if not players:
         return []
 
-    # Load all completed matches once
+    # Load all completed matches with points (for rally duration)
     matches_result = await db.execute(
-        select(Match).where(Match.status == "completed")
+        select(Match)
+        .options(selectinload(Match.points))
+        .where(Match.status == "completed")
     )
     all_completed = matches_result.scalars().all()
 
@@ -150,14 +157,23 @@ async def get_leaderboard(db: AsyncSession) -> List[LeaderboardEntry]:
         losses = total - wins
         win_rate = round(wins / total, 3) if total > 0 else 0.0
 
+        durations = [
+            p.rally_duration_seconds
+            for m in player_matches
+            for p in m.points
+            if p.scoring_side != "start" and p.rally_duration_seconds is not None
+        ]
+        avg_rally = round(sum(durations) / len(durations), 1) if durations else None
+
         entries.append(LeaderboardEntry(
-            rank=0,  # assigned after sorting
+            rank=0,
             player_id=player.id,
             player_name=player.name,
             matches_played=total,
             wins=wins,
             losses=losses,
             win_rate=win_rate,
+            avg_rally_duration_seconds=avg_rally,
         ))
 
     entries.sort(key=lambda e: (-e.wins, -e.win_rate, e.player_name))
@@ -166,3 +182,90 @@ async def get_leaderboard(db: AsyncSession) -> List[LeaderboardEntry]:
         entry.rank = i
 
     return entries
+
+
+async def get_player_shot_analytics(db: AsyncSession, player_id: str) -> Optional[ShotAnalytics]:
+    """Compute shot type, end reason, rally duration, and serve error stats for a player."""
+    result = await db.execute(select(Player).where(Player.id == player_id))
+    if not result.scalar_one_or_none():
+        return None
+
+    # Load all completed matches for this player with their points
+    matches_result = await db.execute(
+        select(Match)
+        .options(selectinload(Match.points))
+        .where(Match.status == "completed")
+    )
+    all_completed = matches_result.scalars().all()
+
+    player_matches = [
+        m for m in all_completed
+        if player_id in m.team_a_player_ids or player_id in m.team_b_player_ids
+    ]
+
+    # Collect all non-start points from the player's matches
+    all_points = [
+        p for m in player_matches
+        for p in m.points
+        if p.scoring_side != "start"
+    ]
+
+    # Points that have any metadata at all
+    detailed_points = [p for p in all_points if
+        p.rally_duration_seconds is not None or
+        p.point_end_reason is not None or
+        p.shot_type is not None or
+        p.winning_player_id is not None
+    ]
+
+    total_detailed = len(detailed_points)
+
+    # Average rally duration
+    durations = [p.rally_duration_seconds for p in all_points if p.rally_duration_seconds is not None]
+    avg_duration = round(sum(durations) / len(durations), 1) if durations else None
+
+    # Shot breakdown — points where THIS player played the winning shot
+    shot_counts: dict[str, int] = {}
+    for p in all_points:
+        if p.winning_player_id == player_id and p.shot_type:
+            shot_counts[p.shot_type] = shot_counts.get(p.shot_type, 0) + 1
+
+    shots: List[ShotBreakdown] = []
+    total_winning_shots = sum(shot_counts.values())
+    for shot_type, count in sorted(shot_counts.items(), key=lambda x: -x[1]):
+        shots.append(ShotBreakdown(
+            shot_type=shot_type,
+            label=SHOT_LABELS.get(shot_type, shot_type),
+            count=count,
+            wins=count,  # every winning-player shot is a win for that player
+            win_rate=round(count / total_winning_shots, 3) if total_winning_shots else 0.0,
+        ))
+
+    # End reason breakdown — all points in player's matches that have a reason
+    reason_counts: dict[str, int] = {}
+    for p in all_points:
+        if p.point_end_reason:
+            reason_counts[p.point_end_reason] = reason_counts.get(p.point_end_reason, 0) + 1
+
+    end_reasons: List[EndReasonBreakdown] = []
+    total_reasons = sum(reason_counts.values())
+    for reason, count in sorted(reason_counts.items(), key=lambda x: -x[1]):
+        end_reasons.append(EndReasonBreakdown(
+            reason=reason,
+            label=END_REASON_LABELS.get(reason, reason),
+            count=count,
+            percentage=round(count / total_reasons * 100, 1) if total_reasons else 0.0,
+        ))
+
+    # Serve error rate — serve_error points where player was server / all points where player was server
+    served_points = [p for p in all_points if p.server_id == player_id]
+    serve_errors = [p for p in served_points if p.point_end_reason == "serve_error"]
+    serve_error_rate = round(len(serve_errors) / len(served_points), 3) if served_points else None
+
+    return ShotAnalytics(
+        total_detailed_points=total_detailed,
+        avg_rally_duration_seconds=avg_duration,
+        shots=shots,
+        end_reasons=end_reasons,
+        serve_error_rate=serve_error_rate,
+    )
