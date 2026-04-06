@@ -9,6 +9,8 @@ import LiveScorePage from "./pages/LiveScorePage";
 import TournamentsPage from "./pages/TournamentsPage";
 import CreateTournamentPage from "./pages/CreateTournamentPage";
 import TournamentDetailPage from "./pages/TournamentDetailPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import SummaryScorePage from "./pages/SummaryScorePage";
 
 export default function App() {
   return (
@@ -27,7 +29,11 @@ export default function App() {
           {/* Matches */}
           <Route path="matches" element={<MatchesPage />} />
           <Route path="/matches/new" element={<CreateMatchPage />} />
+          <Route path="/matches/:id/summary" element={<SummaryScorePage />} />
           <Route path="/matches/:id" element={<LiveScorePage />} />
+
+          {/* Analytics */}
+          <Route path="analytics" element={<AnalyticsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

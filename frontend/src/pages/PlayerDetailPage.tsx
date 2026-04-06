@@ -1,14 +1,24 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { playerApi } from "../api/client";
+import { playerApi, analyticsApi, TournamentMedal } from "../api/client";
 import "./PlayerDetailPage.css";
+
+const MEDAL_ICONS: Record<string, string> = {
+  gold: "🥇",
+  silver: "🥈",
+  bronze: "🥉",
+};
 
 export default function PlayerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: player, loading, error, refetch } = useApi(
     () => playerApi.get(id!),
+    [id]
+  );
+  const { data: analytics, loading: statsLoading } = useApi(
+    () => analyticsApi.getPlayerStats(id!),
     [id]
   );
 
@@ -74,6 +84,10 @@ export default function PlayerDetailPage() {
     month: "long",
     day: "numeric",
   });
+
+  const winRatePct = analytics
+    ? `${Math.round(analytics.matches.win_rate * 100)}%`
+    : "—";
 
   return (
     <div className="detail-page animate-fade-in">
@@ -142,15 +156,51 @@ export default function PlayerDetailPage() {
           <span className="detail-label">Joined</span>
           <span className="detail-value">{joinDate}</span>
         </div>
-        <div className="detail-card card detail-card--disabled">
+        <div className={`detail-card card${statsLoading || !analytics ? " detail-card--loading" : ""}`}>
           <span className="detail-label">Matches Played</span>
-          <span className="detail-value">—</span>
+          <span className="detail-value">
+            {statsLoading ? "…" : analytics ? analytics.matches.total : "—"}
+          </span>
         </div>
-        <div className="detail-card card detail-card--disabled">
+        <div className={`detail-card card${statsLoading || !analytics ? " detail-card--loading" : ""}`}>
           <span className="detail-label">Win Rate</span>
-          <span className="detail-value">—</span>
+          <span className="detail-value">
+            {statsLoading ? "…" : analytics ? winRatePct : "—"}
+          </span>
+        </div>
+        <div className={`detail-card card${statsLoading || !analytics ? " detail-card--loading" : ""}`}>
+          <span className="detail-label">Wins</span>
+          <span className="detail-value detail-value--wins">
+            {statsLoading ? "…" : analytics ? analytics.matches.wins : "—"}
+          </span>
+        </div>
+        <div className={`detail-card card${statsLoading || !analytics ? " detail-card--loading" : ""}`}>
+          <span className="detail-label">Losses</span>
+          <span className="detail-value detail-value--losses">
+            {statsLoading ? "…" : analytics ? analytics.matches.losses : "—"}
+          </span>
         </div>
       </div>
+
+      {/* Tournament Medals Section */}
+      {!statsLoading && analytics && analytics.tournaments.participated > 0 && (
+        <div className="medals-section">
+          <h3 className="medals-title">Tournament Medals</h3>
+          <div className="medals-list">
+            {analytics.tournaments.medals.map((medal: TournamentMedal) => (
+              <div key={medal.tournament_id} className="medal-card card">
+                <span className="medal-icon">{MEDAL_ICONS[medal.medal]}</span>
+                <div className="medal-info">
+                  <span className="medal-tournament">{medal.tournament_name}</span>
+                  <span className="medal-record">
+                    {medal.wins}W / {medal.losses}L
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
