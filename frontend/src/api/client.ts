@@ -129,15 +129,47 @@ export interface GameState {
   serving_side: "a" | "b";
 }
 
+export type TrackingLevel = "summary" | "sequence" | "detailed";
+
+export type PointEndReason = "winner" | "unforced_error" | "forced_error" | "serve_error" | "net_error" | "line_out";
+export type ShotType = "smash" | "drop" | "clear" | "lob" | "drive" | "net_shot" | "serve" | "flick" | "push" | "lift";
+
+export interface PointDetail {
+  id: number;
+  scoring_side: "a" | "b" | "start";
+  game_number: number;
+  score_a_after: number;
+  score_b_after: number;
+  server_id: string;
+  created_at: string;
+  rally_duration_seconds: number | null;
+  point_end_reason: PointEndReason | null;
+  shot_type: ShotType | null;
+  winning_player_id: string | null;
+}
+
+export interface PointMetadataUpdate {
+  rally_duration_seconds?: number;
+  point_end_reason?: PointEndReason;
+  shot_type?: ShotType;
+  winning_player_id?: string;
+}
+
+export interface GameScoreInput {
+  score_a: number;
+  score_b: number;
+}
+
 export interface MatchData {
   id: string;
   match_type: "singles" | "doubles";
   status: "in_progress" | "completed";
+  tracking_level: TrackingLevel;
   team_a: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
   team_b: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
   current_game?: GameState;
   games: any[];
-  points: any[];
+  points: PointDetail[];
   winner_side?: "a" | "b" | null;
   tournament_id?: string;
   created_at: string;
@@ -154,6 +186,7 @@ export interface CreateMatchData {
   team_b_player_ids: string[];
   first_server_id: string;
   tournament_id?: string;
+  tracking_level?: TrackingLevel;
 }
 
 /* --- Match API --- */
@@ -171,7 +204,67 @@ export const matchApi = {
   undoPoint: (id: string) =>
     request<{undone: boolean, current_game: GameState, game_restored: boolean}>(
       `/matches/${id}/undo`, { method: "POST" }
-    )
+    ),
+  updatePointMetadata: (matchId: string, pointId: number, data: PointMetadataUpdate) =>
+    request<{id: number, rally_duration_seconds: number | null, point_end_reason: string | null, shot_type: string | null, winning_player_id: string | null}>(
+      `/matches/${matchId}/points/${pointId}`, { method: "PATCH", body: JSON.stringify(data) }
+    ),
+  submitSummary: (matchId: string, games: GameScoreInput[]) =>
+    request<MatchData>(`/matches/${matchId}/summary`, { method: "POST", body: JSON.stringify({ games }) }),
+};
+
+/* --- Analytics Types --- */
+
+export interface MatchStats {
+  total: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+}
+
+export interface GameStats {
+  total: number;
+  wins: number;
+  losses: number;
+}
+
+export interface TournamentMedal {
+  tournament_id: string;
+  tournament_name: string;
+  wins: number;
+  losses: number;
+  medal: "gold" | "silver" | "bronze";
+}
+
+export interface TournamentStats {
+  participated: number;
+  medals: TournamentMedal[];
+}
+
+export interface PlayerAnalytics {
+  player_id: string;
+  player_name: string;
+  matches: MatchStats;
+  games: GameStats;
+  tournaments: TournamentStats;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  player_id: string;
+  player_name: string;
+  matches_played: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+}
+
+/* --- Analytics API --- */
+
+export const analyticsApi = {
+  getPlayerStats: (playerId: string) =>
+    request<PlayerAnalytics>(`/analytics/players/${playerId}`),
+  getLeaderboard: () => request<LeaderboardEntry[]>("/analytics/leaderboard"),
 };
 
 /* --- Health API --- */

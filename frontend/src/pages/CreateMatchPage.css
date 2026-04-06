@@ -92,3 +92,59 @@
   font-size: var(--font-size-base);
   padding: var(--space-md);
 }
+
+/* Tracking level selector */
+.tracking-selector {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+}
+
+.tracking-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.tracking-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  text-align: left;
+  transition: all var(--transition-fast);
+  width: 100%;
+  cursor: pointer;
+}
+
+.tracking-option:hover {
+  border-color: var(--color-primary);
+  background: rgba(26, 115, 232, 0.05);
+}
+
+.tracking-option--active {
+  border-color: var(--color-primary);
+  background: rgba(26, 115, 232, 0.1);
+}
+
+.tracking-option-label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.tracking-option--active .tracking-option-label {
+  color: var(--color-primary-light, #6ca9f0);
+}
+
+.tracking-option-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+

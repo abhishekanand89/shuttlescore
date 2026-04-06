@@ -57,6 +57,14 @@ export default function Layout() {
           </span>
           <span className="nav-label">Matches</span>
         </NavLink>
+        <NavLink
+          to="/analytics"
+          className={({ isActive }) => `nav-item ${isActive ? "nav-item--active" : ""}`}
+          id="nav-analytics"
+        >
+          <span className="nav-icon" aria-hidden="true">📊</span>
+          <span className="nav-label">Analytics</span>
+        </NavLink>
       </nav>
     </div>
   );

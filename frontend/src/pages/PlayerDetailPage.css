@@ -143,6 +143,64 @@
 .skeleton-wide { width: 200px; }
 .skeleton-narrow { width: 120px; }
 
+.detail-card--loading {
+  opacity: 0.6;
+}
+
+.detail-value--wins { color: #4caf50; }
+.detail-value--losses { color: var(--color-error, #f44336); }
+
+/* Tournament Medals */
+.medals-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.medals-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--font-size-xs);
+}
+
+.medals-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.medal-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.medal-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.medal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.medal-tournament {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.medal-record {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
 /* Error */
 .detail-error {
   text-align: center;
