@@ -11,7 +11,7 @@ from app.schemas.match import MatchListItem
 
 router = APIRouter(tags=["tournaments"])
 
-@router.get("/tournaments", response_model=List[TournamentResponse])
+@router.get("/tournaments")
 async def list_tournaments(
     status: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
@@ -22,9 +22,9 @@ async def list_tournaments(
     
     result = await db.execute(query)
     tournaments = result.scalars().all()
-    return tournaments
+    return {"success": True, "data": [TournamentResponse.model_validate(t).model_dump() for t in tournaments]}
 
-@router.post("/tournaments", response_model=TournamentResponse, status_code=201)
+@router.post("/tournaments", status_code=201)
 async def create_tournament(
     data: TournamentCreate,
     db: AsyncSession = Depends(get_db)
@@ -39,7 +39,7 @@ async def create_tournament(
     db.add(tournament)
     await db.commit()
     await db.refresh(tournament)
-    return tournament
+    return {"success": True, "data": TournamentResponse.model_validate(tournament).model_dump()}
 
 @router.get("/tournaments/{tournament_id}", response_model=dict)
 async def get_tournament_detail(
@@ -67,4 +67,4 @@ async def get_tournament_detail(
     # Let's just return basic info or depend on the frontend using `GET /matches?tournament_id=X`.
     # Based on the architecture: "GET /api/tournaments/{id}: Fetch tournament details and associated matches."
     
-    return {"tournament": res_tournament}
+    return {"success": True, "data": {"tournament": res_tournament}}
