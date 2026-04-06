@@ -11,7 +11,7 @@
 - **Runtime**: Python 3.12 (backend), Node.js 20 (frontend)
 - **Language**: Python (backend), TypeScript (frontend)
 - **Framework**: FastAPI 0.115+ (backend), React 19 + Vite 6 (frontend PWA)
-- **Database**: SQLite + SQLAlchemy 2.0 (async) + Alembic (migrations)
+- **Database**: PostgreSQL 15 (production via Docker) + SQLAlchemy 2.0 async + SQLite in-memory (tests)
 - **Auth**: Simple player identification (no heavy auth for MVP)
 - **Testing**: pytest + httpx (backend), Vitest + Testing Library (frontend)
 - **Styling**: Vanilla CSS (mobile-first, responsive)
@@ -42,13 +42,16 @@
 - Data Fetching: Custom `useApi` hook wrapping fetch
 - Error Handling: FastAPI exception handlers → consistent error responses
 - Scoring Engine: Centralized service that enforces badminton rules (21-point, deuce, 30-cap)
+- Tracking Levels: Matches have `tracking_level` (`summary` | `sequence` | `detailed`). In `detailed` mode, each `Point` carries optional metadata: `rally_duration_seconds`, `point_end_reason`, `shot_type`, `winning_player_id`
+- Analytics Service: Stateless computation of win/loss records, game stats, and tournament medals from existing `Match`/`GameResult` data — no separate stats table
 
 ## Existing Test Patterns
 - **Framework**: pytest (backend), Vitest (frontend)
 - **Location**: `tests/`
 - **Naming Convention**: `test_*.py` (backend), `*.test.tsx` (frontend)
-- **Run Command**: `cd backend && pytest` / `cd frontend && npm test`
-- **Example File**: (none yet — first feature will establish patterns)
+- **Run Command**: `source backend/venv/bin/activate && PYTHONPATH=backend pytest tests/ -v`
+- **Test Count**: 51 passing (as of FEAT-007)
+- **Example Files**: `tests/api/test_analytics.py`, `tests/api/test_point_metadata.py`
 
 ## Key Dependencies
 | Dependency | Version | Purpose |
@@ -65,4 +68,9 @@
 ## Feature History
 | ID | Name | Date Completed |
 |----|------|---------------|
-| — | — | — |
+| FEAT-001 | Player Management | 2026-01-01 |
+| FEAT-002 | Match Scoring | 2026-01-01 |
+| FEAT-003 | Tournament Management | 2026-01-01 |
+| FEAT-004 | PostgreSQL + Docker | 2026-01-01 |
+| FEAT-006 | Analytics Dashboard | 2026-04-06 |
+| FEAT-007 | Point Detail Tracking | 2026-04-06 |
