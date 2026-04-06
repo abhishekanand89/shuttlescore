@@ -4,6 +4,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 VALID_TRACKING_LEVELS = {"summary", "sequence", "detailed"}
+VALID_MATCH_FORMATS = {"bo1", "bo3"}
 VALID_END_REASONS = {"winner", "unforced_error", "forced_error", "serve_error", "net_error", "line_out"}
 VALID_SHOT_TYPES = {"smash", "drop", "clear", "lob", "drive", "net_shot", "serve", "flick", "push", "lift"}
 
@@ -14,6 +15,7 @@ class MatchCreate(BaseModel):
     first_server_id: str
     tournament_id: Optional[str] = Field(None, description="Optional association with a tournament")
     tracking_level: str = Field("sequence", description="'summary' | 'sequence' | 'detailed'")
+    match_format: str = Field("bo3", description="'bo1' (single game) | 'bo3' (best of 3)")
 
 class GameStateBase(BaseModel):
     game_number: int
@@ -49,6 +51,7 @@ class TeamBase(BaseModel):
 class MatchResponse(BaseModel):
     id: str
     match_type: str
+    match_format: str
     status: str
     tracking_level: str
     team_a: TeamBase

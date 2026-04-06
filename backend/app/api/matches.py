@@ -37,6 +37,7 @@ async def _build_match_response(db: AsyncSession, match) -> dict:
     return {
         "id": match.id,
         "match_type": match.match_type,
+        "match_format": match.match_format,
         "status": match.status,
         "tracking_level": match.tracking_level,
         "team_a": {

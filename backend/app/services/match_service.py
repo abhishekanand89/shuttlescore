@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.match import Match, GameResult, Point
 from app.models.player import Player
-from app.schemas.match import MatchCreate, MatchScoreUpdate, PointMetadataUpdate, MatchSummarySubmit, VALID_END_REASONS, VALID_SHOT_TYPES, VALID_TRACKING_LEVELS
+from app.schemas.match import MatchCreate, MatchScoreUpdate, PointMetadataUpdate, MatchSummarySubmit, VALID_END_REASONS, VALID_SHOT_TYPES, VALID_TRACKING_LEVELS, VALID_MATCH_FORMATS
 from app.services.scoring_engine import GameState, MatchState, process_point
 import uuid
 
@@ -33,11 +33,14 @@ async def create_match(db: AsyncSession, data: MatchCreate) -> Match:
 
     if data.tracking_level not in VALID_TRACKING_LEVELS:
         raise ValueError(f"Invalid tracking_level. Must be one of: {', '.join(sorted(VALID_TRACKING_LEVELS))}")
+    if data.match_format not in VALID_MATCH_FORMATS:
+        raise ValueError(f"Invalid match_format. Must be one of: {', '.join(sorted(VALID_MATCH_FORMATS))}")
 
     match_id = str(uuid.uuid4())
     match = Match(
         id=match_id,
         match_type=data.match_type,
+        match_format=data.match_format,
         status="in_progress",
         tracking_level=data.tracking_level,
         team_a_player_ids=data.team_a_player_ids,
@@ -138,13 +141,15 @@ async def score_point(db: AsyncSession, match_id: str, scoring_side: str) -> dic
         if not last_servers[side]:
             last_servers[side] = p.server_id
             
+    games_to_win = 1 if match.match_format == "bo1" else 2
     new_state, point_record = process_point(
         match_state=state,
         scoring_side=scoring_side,
         team_a_ids=match.team_a_player_ids,
         team_b_ids=match.team_b_player_ids,
         match_type=match.match_type,
-        last_servers=last_servers
+        last_servers=last_servers,
+        games_to_win=games_to_win
     )
     
     # Save elements

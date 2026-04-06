@@ -43,15 +43,17 @@
 - Error Handling: FastAPI exception handlers → consistent error responses
 - Scoring Engine: Centralized service that enforces badminton rules (21-point, deuce, 30-cap)
 - Tracking Levels: Matches have `tracking_level` (`summary` | `sequence` | `detailed`). In `detailed` mode, each `Point` carries optional metadata: `rally_duration_seconds`, `point_end_reason`, `shot_type`, `winning_player_id`
-- Analytics Service: Stateless computation of win/loss records, game stats, and tournament medals from existing `Match`/`GameResult` data — no separate stats table
+- Match Format: Matches have `match_format` (`bo1` | `bo3`). The scoring engine's `games_to_win` parameter is driven by this field (1 for bo1, 2 for bo3)
+- Analytics Service: Stateless computation of win/loss records, game stats, tournament medals, shot breakdowns, and rally stats from existing `Match`/`GameResult`/`Point` data — no separate stats table
+- Rally Gate: Frontend-only state machine (`in_rally` / `between_rallies`) that gates point scoring behind a "Start Rally" tap, so the timer doesn't run during shuttle collection
 
 ## Existing Test Patterns
 - **Framework**: pytest (backend), Vitest (frontend)
 - **Location**: `tests/`
 - **Naming Convention**: `test_*.py` (backend), `*.test.tsx` (frontend)
 - **Run Command**: `source backend/venv/bin/activate && PYTHONPATH=backend pytest tests/ -v`
-- **Test Count**: 51 passing (as of FEAT-007)
-- **Example Files**: `tests/api/test_analytics.py`, `tests/api/test_point_metadata.py`
+- **Test Count**: 64 passing (as of FEAT-009)
+- **Example Files**: `tests/api/test_analytics.py`, `tests/api/test_point_metadata.py`, `tests/api/test_shot_analytics.py`, `tests/api/test_match_format.py`
 
 ## Key Dependencies
 | Dependency | Version | Purpose |
@@ -74,3 +76,5 @@
 | FEAT-004 | PostgreSQL + Docker | 2026-01-01 |
 | FEAT-006 | Analytics Dashboard | 2026-04-06 |
 | FEAT-007 | Point Detail Tracking | 2026-04-06 |
+| FEAT-008 | Shot & Rally Analytics | 2026-04-06 |
+| FEAT-009 | Match Format (bo1/bo3) & Rally Gate | 2026-04-06 |

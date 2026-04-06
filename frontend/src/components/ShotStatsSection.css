@@ -1,0 +1,131 @@
+.shot-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.shot-section-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Empty state */
+.shot-empty {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.shot-empty-icon { font-size: 2rem; }
+.shot-empty-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+.shot-empty-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  max-width: 260px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Summary stat cards */
+.shot-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.shot-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.shot-summary-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shot-summary-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* Breakdown tables */
+.shot-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.shot-breakdown-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.shot-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.shot-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 32px 40px;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.shot-row-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shot-row-bar-col {
+  /* stretches to fill */
+}
+
+.stat-bar-track {
+  height: 6px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-border, rgba(255,255,255,0.1));
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full, 9999px);
+  transition: width 0.4s ease;
+  min-width: 3px;
+}
+
+.shot-row-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: right;
+  font-feature-settings: "tnum";
+}
+
+.shot-row-rate {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-align: right;
+  font-feature-settings: "tnum";
+}

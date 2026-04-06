@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import { playerApi, analyticsApi } from "../api/client";
 import type { TournamentMedal } from "../api/client";
+import ShotStatsSection from "../components/ShotStatsSection";
 import "./PlayerDetailPage.css";
 
 const MEDAL_ICONS: Record<string, string> = {
@@ -20,6 +21,10 @@ export default function PlayerDetailPage() {
   );
   const { data: analytics, loading: statsLoading } = useApi(
     () => analyticsApi.getPlayerStats(id!),
+    [id]
+  );
+  const { data: shotData } = useApi(
+    () => analyticsApi.getPlayerShots(id!),
     [id]
   );
 
@@ -182,6 +187,9 @@ export default function PlayerDetailPage() {
           </span>
         </div>
       </div>
+
+      {/* Shot Analytics Section */}
+      {shotData && <ShotStatsSection data={shotData} />}
 
       {/* Tournament Medals Section */}
       {!statsLoading && analytics && analytics.tournaments.participated > 0 && (

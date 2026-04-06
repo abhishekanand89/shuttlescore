@@ -40,8 +40,9 @@ export default function LiveScorePage() {
   const [pendingMetadata, setPendingMetadata] = useState<PendingMetadata | null>(null);
   const [editingPoint, setEditingPoint] = useState<EditingPoint | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [rallyState, setRallyState] = useState<"in_rally" | "between_rallies">("between_rallies");
 
-  // Rally timer
+  // Rally timer — only ticks when in_rally
   const rallyStartRef = useRef<number>(Date.now());
   const [elapsed, setElapsed] = useState(0);
 
@@ -51,14 +52,14 @@ export default function LiveScorePage() {
     if (data) setMatchData(data);
   }, [data]);
 
-  // Tick timer every second
+  // Tick timer every second — only while actively in a rally
   useEffect(() => {
-    if (matchData?.status === "completed") return;
+    if (matchData?.status === "completed" || rallyState !== "in_rally") return;
     const interval = setInterval(() => {
       setElapsed(Math.floor((Date.now() - rallyStartRef.current) / 1000));
     }, 1000);
     return () => clearInterval(interval);
-  }, [matchData?.status]);
+  }, [matchData?.status, rallyState]);
 
   const isDetailed = matchData?.tracking_level === "detailed";
 
@@ -75,13 +76,21 @@ export default function LiveScorePage() {
     setElapsed(0);
   }, []);
 
+  const handleStartRally = () => {
+    rallyStartRef.current = Date.now();
+    setElapsed(0);
+    setRallyState("in_rally");
+  };
+
   const handleScore = async (side: "a" | "b") => {
     if (!matchData || matchData.status === "completed" || loadingAction) return;
+    if (rallyState !== "in_rally") return;
     const duration = Math.floor((Date.now() - rallyStartRef.current) / 1000);
     try {
       setLoadingAction(true);
       const result = await matchApi.scorePoint(id!, side);
       await refetch();
+      setRallyState("between_rallies");
       resetTimer();
 
       if (isDetailed && result.point?.id != null) {
@@ -130,14 +139,23 @@ export default function LiveScorePage() {
   if (loading && !matchData) return <div className="detail-page"><div className="loading-state">Loading match…</div></div>;
   if (error || !matchData) return <div className="detail-page"><div className="error-state">⚠️ {error || "Match not found"}</div></div>;
 
-  const { team_a, team_b, current_game, status, match_type, winner_side } = matchData;
+  const { team_a, team_b, current_game, status, match_type, match_format, winner_side } = matchData;
   const isCompleted = status === "completed";
+  const isBo1 = match_format === "bo1";
+  const gamesNeededToWin = isBo1 ? 1 : 2;
 
   const renderGameDots = (wins: number) => (
     <div className="game-dots">
-      {[0, 1].map((i) => <div key={i} className={`dot ${i < wins ? "won" : ""}`} />)}
+      {Array.from({ length: gamesNeededToWin }).map((_, i) => (
+        <div key={i} className={`dot ${i < wins ? "won" : ""}`} />
+      ))}
     </div>
   );
+
+  // "Start Rally" is shown when between rallies and no metadata sheet is open
+  const showStartRally = !isCompleted && rallyState === "between_rallies" && !pendingMetadata;
+  // Score buttons are only active during a rally
+  const scoringEnabled = !isCompleted && rallyState === "in_rally";
 
   const recentPoints = [...matchData.points].reverse().slice(0, 10);
 
@@ -191,8 +209,8 @@ export default function LiveScorePage() {
 
         {/* Rally timer (detailed mode only) */}
         {isDetailed && !isCompleted && (
-          <div className="rally-timer">
-            <span className="rally-timer-label">Rally</span>
+          <div className={`rally-timer ${rallyState === "in_rally" ? "rally-timer--active" : "rally-timer--paused"}`}>
+            <span className="rally-timer-label">{rallyState === "in_rally" ? "Rally" : "Paused"}</span>
             <span className="rally-timer-value">{elapsed}s</span>
           </div>
         )}
@@ -254,20 +272,32 @@ export default function LiveScorePage() {
 
       {!isCompleted && (
         <div className="score-buttons">
-          <button
-            className="score-btn score-btn-a"
-            onClick={() => handleScore("a")}
-            disabled={loadingAction}
-          >
-            + Point
-          </button>
-          <button
-            className="score-btn score-btn-b"
-            onClick={() => handleScore("b")}
-            disabled={loadingAction}
-          >
-            + Point
-          </button>
+          {showStartRally ? (
+            <button
+              className="score-btn start-rally-btn"
+              onClick={handleStartRally}
+              disabled={loadingAction}
+            >
+              🏸 Start Rally
+            </button>
+          ) : (
+            <>
+              <button
+                className="score-btn score-btn-a"
+                onClick={() => handleScore("a")}
+                disabled={!scoringEnabled || loadingAction}
+              >
+                + Point
+              </button>
+              <button
+                className="score-btn score-btn-b"
+                onClick={() => handleScore("b")}
+                disabled={!scoringEnabled || loadingAction}
+              >
+                + Point
+              </button>
+            </>
+          )}
         </div>
       )}
 

@@ -29,12 +29,13 @@ class MatchState:
     winner_side: Optional[str]
 
 def process_point(
-    match_state: MatchState, 
-    scoring_side: str, 
-    team_a_ids: List[str], 
-    team_b_ids: List[str], 
+    match_state: MatchState,
+    scoring_side: str,
+    team_a_ids: List[str],
+    team_b_ids: List[str],
     match_type: str,
-    last_servers: dict  # {"a": str, "b": str}
+    last_servers: dict,  # {"a": str, "b": str}
+    games_to_win: int = 2,
 ) -> tuple[MatchState, PointRecord]:
     """Pure function to process a scored point and return new state."""
     
@@ -96,7 +97,7 @@ def process_point(
         else:
             match_state.games_won_b += 1
             
-        if match_state.games_won_a == 2 or match_state.games_won_b == 2:
+        if match_state.games_won_a >= games_to_win or match_state.games_won_b >= games_to_win:
             match_state.is_finished = True
             match_state.winner_side = scoring_side
         else:
