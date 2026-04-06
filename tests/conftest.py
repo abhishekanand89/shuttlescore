@@ -3,9 +3,8 @@ import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 
-# Override database to use in-memory SQLite for tests
-import app.config
-app.config.settings.database_url = "sqlite+aiosqlite:///:memory:"
+import os
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 
 from app.main import app as fastapi_app  # noqa: E402
 from app.db.database import engine  # noqa: E402
