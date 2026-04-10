@@ -22,6 +22,13 @@ function LeaderboardRow({
   const rankLabel =
     entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : entry.rank === 3 ? "🥉" : `#${entry.rank}`;
 
+  const eloColor = entry.elo_rating >= 1600 ? "lb-elo--high"
+    : entry.elo_rating >= 1450 ? "lb-elo--mid" : "lb-elo--low";
+
+  const sv = entry.shapley_value;
+  const svPct = sv != null ? Math.round(sv * 100) : null;
+  const svClass = sv == null ? "" : sv > 0.02 ? "lb-impact--pos" : sv < -0.02 ? "lb-impact--neg" : "lb-impact--neutral";
+
   return (
     <button className="lb-row card" onClick={onClick} aria-label={`View ${entry.player_name} analytics`}>
       <span className="lb-rank">{rankLabel}</span>
@@ -31,15 +38,14 @@ function LeaderboardRow({
         <span className="lb-sep"> / </span>
         <span className="lb-losses">{entry.losses}L</span>
       </span>
+      <span className={`lb-elo ${eloColor}`}>{entry.elo_rating}</span>
+      <span className={`lb-impact ${svClass}`}>
+        {svPct != null ? `${svPct > 0 ? "+" : ""}${svPct}%` : "—"}
+      </span>
       <div className="lb-winrate-col">
         <span className="lb-winrate-pct">{Math.round(entry.win_rate * 100)}%</span>
         <WinRateBar rate={entry.win_rate} />
       </div>
-      <span className="lb-rally">
-        {entry.avg_rally_duration_seconds != null
-          ? `${entry.avg_rally_duration_seconds}s`
-          : "—"}
-      </span>
     </button>
   );
 }
@@ -87,8 +93,9 @@ export default function AnalyticsPage() {
             <span>Rank</span>
             <span>Player</span>
             <span>W / L</span>
+            <span>Elo</span>
+            <span>Impact</span>
             <span>Win Rate</span>
-            <span>Avg Rally</span>
           </div>
           {leaderboard.map((entry) => (
             <LeaderboardRow

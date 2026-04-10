@@ -53,6 +53,10 @@ async def _build_match_response(db: AsyncSession, match) -> dict:
         "points": [_serialize_point(p) for p in match.points if p.scoring_side != "start"],
         "winner_side": match.winner_side,
         "tournament_id": match.tournament_id,
+        "season_id": match.season_id,
+        "location_name": match.location_name,
+        "latitude": match.latitude,
+        "longitude": match.longitude,
         "created_at": match.created_at
     }
 
@@ -66,8 +70,8 @@ async def create_match(data: MatchCreate, db: AsyncSession = Depends(get_db)):
     return {"success": True, "data": await _build_match_response(db, match)}
 
 @router.get("/matches")
-async def list_matches(tournament_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
-    matches = await match_service.list_matches(db, tournament_id)
+async def list_matches(tournament_id: Optional[str] = None, season_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    matches = await match_service.list_matches(db, tournament_id, season_id=season_id)
     items = []
     
     for match in matches:

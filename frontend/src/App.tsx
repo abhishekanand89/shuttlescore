@@ -11,6 +11,9 @@ import CreateTournamentPage from "./pages/CreateTournamentPage";
 import TournamentDetailPage from "./pages/TournamentDetailPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SummaryScorePage from "./pages/SummaryScorePage";
+import LeaguesPage from "./pages/LeaguesPage";
+import LeagueDetailPage from "./pages/LeagueDetailPage";
+import SeasonDetailPage from "./pages/SeasonDetailPage";
 
 export default function App() {
   return (
@@ -31,6 +34,11 @@ export default function App() {
           <Route path="/matches/new" element={<CreateMatchPage />} />
           <Route path="/matches/:id/summary" element={<SummaryScorePage />} />
           <Route path="/matches/:id" element={<LiveScorePage />} />
+
+          {/* Leagues */}
+          <Route path="leagues" element={<LeaguesPage />} />
+          <Route path="leagues/:id" element={<LeagueDetailPage />} />
+          <Route path="seasons/:id" element={<SeasonDetailPage />} />
 
           {/* Analytics */}
           <Route path="analytics" element={<AnalyticsPage />} />

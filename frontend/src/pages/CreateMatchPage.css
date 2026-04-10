@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  padding-bottom: 100px; /* For floating action bar */
+  padding-bottom: 100px;
 }
 
 .header-row {
@@ -11,18 +11,20 @@
   gap: var(--space-md);
 }
 
+/* ── Singles/Doubles toggle ── */
 .match-type-toggle {
   display: flex;
-  background: var(--color-surface);
+  background: var(--color-border);
   border-radius: var(--radius-full);
-  padding: 4px;
+  padding: 3px;
+  gap: 3px;
 }
 
 .toggle-btn {
   flex: 1;
   padding: var(--space-sm) 0;
   border-radius: var(--radius-full);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 800;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   transition: all var(--transition-fast);
@@ -31,9 +33,10 @@
 .toggle-btn.active {
   background: var(--color-primary);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 3px 0 var(--color-primary-dark);
 }
 
+/* ── Teams ── */
 .teams-container {
   display: flex;
   flex-direction: column;
@@ -41,15 +44,17 @@
 }
 
 .team-title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: var(--space-sm);
 }
 
-.text-a { color: var(--color-primary-light); }
-.text-b { color: var(--color-accent); }
+.text-a { color: var(--color-primary); }
+.text-b { color: #B87800; }
 
+/* ── Player chips ── */
 .player-chips {
   display: flex;
   flex-wrap: wrap;
@@ -58,47 +63,38 @@
 
 .player-chip {
   padding: var(--space-xs) var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: #FFFFFF;
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-secondary);
   transition: all var(--transition-fast);
+  box-shadow: 0 2px 0 var(--color-border-strong);
 }
 
 .player-chip.selected {
   border-color: transparent;
   color: white;
+  box-shadow: none;
 }
 
-.bg-primary { background: var(--color-primary); }
-.bg-accent { background: var(--color-accent-dark); }
-.border-active { border: 2px solid white; background: var(--color-surface-active); }
-
-.floating-action-bar {
-  position: fixed;
-  bottom: 72px; /* Set above layout nav */
-  left: 0;
-  right: 0;
-  padding: var(--space-md);
-  background: linear-gradient(to top, var(--color-bg) 60%, transparent);
-  display: flex;
-  justify-content: center;
-  z-index: 100;
+.bg-primary { background: var(--color-primary); box-shadow: 0 3px 0 var(--color-primary-dark); }
+.bg-accent   { background: var(--color-accent);  color: #5A3800 !important; box-shadow: 0 3px 0 var(--color-accent-dark); }
+.border-active {
+  border: 2px solid var(--color-primary-dark);
+  background: rgba(28, 176, 246, 0.12);
+  color: var(--color-primary) !important;
+  box-shadow: none;
 }
 
-.start-match-btn {
-  width: 100%;
-  max-width: 400px;
-  font-size: var(--font-size-base);
-  padding: var(--space-md);
-}
-
-/* Tracking level selector */
+/* ── Tracking level ── */
 .tracking-selector {
-  background: var(--color-surface);
+  background: #FFFFFF;
   border-radius: var(--radius-lg);
   padding: var(--space-md);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .tracking-options {
@@ -114,7 +110,7 @@
   align-items: flex-start;
   padding: var(--space-md);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   background: transparent;
   text-align: left;
   transition: all var(--transition-fast);
@@ -124,27 +120,105 @@
 
 .tracking-option:hover {
   border-color: var(--color-primary);
-  background: rgba(26, 115, 232, 0.05);
+  background: rgba(28, 176, 246, 0.05);
 }
 
 .tracking-option--active {
   border-color: var(--color-primary);
-  background: rgba(26, 115, 232, 0.1);
+  background: rgba(28, 176, 246, 0.08);
 }
 
 .tracking-option-label {
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 800;
   color: var(--color-text);
 }
 
 .tracking-option--active .tracking-option-label {
-  color: var(--color-primary-light, #6ca9f0);
+  color: var(--color-primary);
 }
 
 .tracking-option-desc {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: 600;
   margin-top: 2px;
 }
 
+/* ── Location ── */
+.location-selector {
+  background: #FFFFFF;
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.location-row {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.location-input { flex: 1; }
+
+.location-gps-btn {
+  padding: 0 14px;
+  font-size: 18px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-active);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.location-gps-btn--active {
+  border-color: var(--color-primary);
+  background: rgba(28, 176, 246, 0.1);
+}
+
+.location-hint {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+
+.location-hint--error {
+  color: var(--color-error);
+}
+
+/* ── Floating Start Match button ── */
+.floating-action-bar {
+  position: fixed;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  padding: var(--space-md);
+  background: linear-gradient(to top, var(--color-bg) 60%, transparent);
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+}
+
+.start-match-btn {
+  width: 100%;
+  max-width: 400px;
+  font-size: var(--font-size-base);
+  padding: var(--space-md);
+  background: var(--color-success);
+  color: white;
+  font-weight: 900;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 6px 0 var(--color-success-dark);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.start-match-btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--color-success-dark);
+}
+
+.start-match-btn:disabled {
+  opacity: 0.4;
+  animation: none;
+}

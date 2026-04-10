@@ -1,23 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
-import { playerApi, matchApi, tournamentApi } from "../api/client";
+import { playerApi, matchApi, tournamentApi, seasonApi } from "../api/client";
 import type { TrackingLevel } from "../api/client";
 type MatchFormat = "bo1" | "bo3";
+
+type LocationState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "granted"; lat: number; lng: number; name: string }
+  | { status: "error"; message: string };
 import "./CreateMatchPage.css";
 
 export default function CreateMatchPage() {
   const navigate = useNavigate();
   const { data: players } = useApi(() => playerApi.list());
   const { data: activeTournaments } = useApi(() => tournamentApi.list("active"));
+  const { data: activeSeasons } = useApi(() => seasonApi.listActive());
   
   const [matchType, setMatchType] = useState<"singles" | "doubles">("singles");
   const [teamA, setTeamA] = useState<string[]>([]);
   const [teamB, setTeamB] = useState<string[]>([]);
   const [server, setServer] = useState<string>("");
   const [tournamentId, setTournamentId] = useState<string>("");
+  const [seasonId, setSeasonId] = useState<string>("");
   const [trackingLevel, setTrackingLevel] = useState<TrackingLevel>("sequence");
   const [matchFormat, setMatchFormat] = useState<MatchFormat>("bo3");
+  const [locationCity, setLocationCity] = useState("");
+  const [locationState, setLocationState] = useState<LocationState>({ status: "idle" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,11 +54,29 @@ export default function CreateMatchPage() {
     }
   };
 
+  const handleGpsLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationState({ status: "error", message: "GPS not available on this device" });
+      return;
+    }
+    setLocationState({ status: "loading" });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const name = locationCity.trim() || `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
+        setLocationState({ status: "granted", lat: latitude, lng: longitude, name });
+      },
+      () => setLocationState({ status: "error", message: "Location access denied" }),
+      { timeout: 8000 }
+    );
+  };
+
   const handleSubmit = async () => {
     if (!isComplete) return;
     setLoading(true);
     setError(null);
     try {
+      const locName = locationCity.trim() || (locationState.status === "granted" ? locationState.name : undefined);
       const res = await matchApi.create({
         match_type: matchType,
         match_format: matchFormat,
@@ -56,7 +84,11 @@ export default function CreateMatchPage() {
         team_b_player_ids: teamB,
         first_server_id: server,
         tournament_id: tournamentId || undefined,
+        season_id: seasonId || undefined,
         tracking_level: trackingLevel,
+        location_name: locName || undefined,
+        latitude: locationState.status === "granted" ? locationState.lat : undefined,
+        longitude: locationState.status === "granted" ? locationState.lng : undefined,
       });
       if (trackingLevel === "summary") {
         navigate(`/matches/${res.id}/summary`);
@@ -192,6 +224,53 @@ export default function CreateMatchPage() {
           </select>
         </div>
       )}
+
+      {/* Season Linkage */}
+      {activeSeasons && activeSeasons.length > 0 && (
+        <div className="tournament-selector animate-slide-up" style={{ marginBottom: "16px", background: "var(--color-surface)", padding: "16px", borderRadius: "12px", border: "1px solid var(--color-border)" }}>
+          <h3 className="section-title" style={{ fontSize: "14px", marginTop: "0", marginBottom: "12px" }}>Link to Season (Optional)</h3>
+          <select
+            className="input"
+            value={seasonId}
+            onChange={(e) => setSeasonId(e.target.value)}
+            style={{ width: "100%", padding: "12px", background: "var(--color-bg-secondary)" }}
+          >
+            <option value="">None</option>
+            {activeSeasons.map(s => (
+              <option key={s.id} value={s.id}>{s.league_name} — {s.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Location */}
+      <div className="location-selector animate-slide-up">
+        <h3 className="section-title">Location <span style={{ fontWeight: "normal", fontSize: "12px", color: "var(--color-text-secondary)" }}>(optional)</span></h3>
+        <div className="location-row">
+          <input
+            className="input location-input"
+            type="text"
+            placeholder="City or venue name"
+            value={locationCity}
+            onChange={(e) => setLocationCity(e.target.value)}
+          />
+          <button
+            type="button"
+            className={`btn location-gps-btn ${locationState.status === "granted" ? "location-gps-btn--active" : ""}`}
+            onClick={handleGpsLocation}
+            disabled={locationState.status === "loading"}
+            title="Use current location"
+          >
+            {locationState.status === "loading" ? "…" : "📍"}
+          </button>
+        </div>
+        {locationState.status === "granted" && (
+          <p className="location-hint">GPS: {locationState.lat.toFixed(4)}, {locationState.lng.toFixed(4)}</p>
+        )}
+        {locationState.status === "error" && (
+          <p className="location-hint location-hint--error">{locationState.message}</p>
+        )}
+      </div>
 
       {/* Tracking level */}
       <div className="tracking-selector animate-slide-up">

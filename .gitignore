@@ -32,3 +32,9 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Frontend build output
+frontend/dist/
+
+# Node
+node_modules/

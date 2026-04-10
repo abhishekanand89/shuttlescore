@@ -22,7 +22,9 @@ async def create_player(data: PlayerCreate, db: AsyncSession = Depends(get_db)):
     try:
         player = await player_service.create_player(db, data)
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        msg = str(e)
+        status = 409 if "already registered" in msg else 422
+        raise HTTPException(status_code=status, detail=msg)
 
     return {
         "success": True,
@@ -64,7 +66,10 @@ async def update_player(
     player_id: str, data: PlayerUpdate, db: AsyncSession = Depends(get_db)
 ):
     """Update a player's information."""
-    player = await player_service.update_player(db, player_id, data)
+    try:
+        player = await player_service.update_player(db, player_id, data)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     return {

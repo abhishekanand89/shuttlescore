@@ -41,10 +41,16 @@ async function request<T>(
 
 /* --- Player Types --- */
 
+export type Gender = "male" | "female" | "non_binary" | "prefer_not_to_say";
+export type SkillLevel = "beginner" | "intermediate" | "advanced" | "competitive";
+
 export interface Player {
   id: string;
   name: string;
   phone: string;
+  age: number | null;
+  gender: Gender | null;
+  skill_level: SkillLevel | null;
   created_at: string;
 }
 
@@ -57,10 +63,16 @@ export interface PlayerListItem {
 export interface CreatePlayerData {
   name: string;
   phone: string;
+  age?: number;
+  gender?: Gender;
+  skill_level?: SkillLevel;
 }
 
 export interface UpdatePlayerData {
   name?: string;
+  age?: number;
+  gender?: Gender;
+  skill_level?: SkillLevel;
 }
 
 /* --- Player API --- */
@@ -94,6 +106,97 @@ export const tournamentApi = {
   get: (id: string) => request<{tournament: TournamentData}>(`/tournaments/${id}`),
   create: (data: CreateTournamentData) =>
     request<TournamentData>("/tournaments", { method: "POST", body: JSON.stringify(data) }),
+};
+
+/* --- League / Season Types --- */
+
+export interface LeaguePlayerItem {
+  id: string;
+  name: string;
+}
+
+export interface SeasonSummary {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  status: "upcoming" | "active" | "completed";
+  match_count: number;
+}
+
+export interface LeagueData {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  players: LeaguePlayerItem[];
+  seasons: SeasonSummary[];
+}
+
+export interface LeagueListItem {
+  id: string;
+  name: string;
+  description: string | null;
+  player_count: number;
+  season_count: number;
+  active_season: string | null;
+  created_at: string;
+}
+
+export interface SeasonData {
+  id: string;
+  league_id: string;
+  league_name: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  status: "upcoming" | "active" | "completed";
+  match_count: number;
+  created_at: string;
+}
+
+export interface CreateLeagueData {
+  name: string;
+  description?: string;
+  player_ids?: string[];
+}
+
+export interface CreateSeasonData {
+  name: string;
+  start_date: string;
+  end_date: string;
+}
+
+/* --- League API --- */
+
+export const leagueApi = {
+  list: () => request<LeagueListItem[]>("/leagues"),
+  get: (id: string) => request<LeagueData>(`/leagues/${id}`),
+  create: (data: CreateLeagueData) =>
+    request<LeagueData>("/leagues", { method: "POST", body: JSON.stringify(data) }),
+  update: (id: string, data: { name?: string; description?: string }) =>
+    request<LeagueData>(`/leagues/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: string) =>
+    request<{ deleted: boolean }>(`/leagues/${id}`, { method: "DELETE" }),
+  addPlayers: (id: string, playerIds: string[]) =>
+    request<LeagueData>(`/leagues/${id}/players`, { method: "POST", body: JSON.stringify({ player_ids: playerIds }) }),
+  removePlayer: (id: string, playerId: string) =>
+    request<LeagueData>(`/leagues/${id}/players/${playerId}`, { method: "DELETE" }),
+  listSeasons: (leagueId: string) =>
+    request<SeasonSummary[]>(`/leagues/${leagueId}/seasons`),
+  createSeason: (leagueId: string, data: CreateSeasonData) =>
+    request<SeasonData>(`/leagues/${leagueId}/seasons`, { method: "POST", body: JSON.stringify(data) }),
+};
+
+export const seasonApi = {
+  get: (id: string) => request<SeasonData>(`/seasons/${id}`),
+  update: (id: string, data: { name?: string; start_date?: string; end_date?: string }) =>
+    request<SeasonData>(`/seasons/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  delete: (id: string) =>
+    request<{ deleted: boolean }>(`/seasons/${id}`, { method: "DELETE" }),
+  updateStatus: (id: string, status: string) =>
+    request<SeasonData>(`/seasons/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  listActive: () => request<SeasonData[]>("/seasons/active"),
 };
 
 /* --- Match Types --- */
@@ -166,6 +269,9 @@ export interface MatchData {
   match_format: "bo1" | "bo3";
   status: "in_progress" | "completed";
   tracking_level: TrackingLevel;
+  location_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
   team_a: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
   team_b: { players: {id: string, name: string}[]; games_won: number; player_names?: string[] };
   current_game?: GameState;
@@ -188,7 +294,11 @@ export interface CreateMatchData {
   team_b_player_ids: string[];
   first_server_id: string;
   tournament_id?: string;
+  season_id?: string;
   tracking_level?: TrackingLevel;
+  location_name?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 /* --- Match API --- */
@@ -260,6 +370,8 @@ export interface LeaderboardEntry {
   losses: number;
   win_rate: number;
   avg_rally_duration_seconds: number | null;
+  elo_rating: number;
+  shapley_value: number | null;
 }
 
 export interface ShotBreakdown {
@@ -285,14 +397,62 @@ export interface ShotAnalytics {
   serve_error_rate: number | null;
 }
 
+export interface ErrorProneShot {
+  shot_type: string;
+  label: string;
+  error_count: number;
+  total_count: number;
+  error_rate: number;
+}
+
+export interface ErrorProneShotAnalytics {
+  total_error_points: number;
+  shots: ErrorProneShot[];
+}
+
+export interface PartnershipSynergy {
+  partner_id: string;
+  partner_name: string;
+  matches_together: number;
+  wins_together: number;
+  pair_win_rate: number;
+  expected_win_rate: number;
+  synergy: number;
+}
+
+export interface ShapleyAnalytics {
+  player_id: string;
+  player_name: string;
+  shapley_value: number;
+  doubles_shapley: number | null;
+  singles_contribution: number | null;
+  doubles_matches: number;
+  singles_matches: number;
+  partnerships_analyzed: number;
+  partnerships: PartnershipSynergy[];
+}
+
 /* --- Analytics API --- */
 
+function scopeParams(league_id?: string, season_id?: string): string {
+  const p = new URLSearchParams();
+  if (season_id) p.set("season_id", season_id);
+  else if (league_id) p.set("league_id", league_id);
+  const s = p.toString();
+  return s ? `?${s}` : "";
+}
+
 export const analyticsApi = {
-  getPlayerStats: (playerId: string) =>
-    request<PlayerAnalytics>(`/analytics/players/${playerId}`),
-  getLeaderboard: () => request<LeaderboardEntry[]>("/analytics/leaderboard"),
-  getPlayerShots: (playerId: string) =>
-    request<ShotAnalytics>(`/analytics/players/${playerId}/shots`),
+  getPlayerStats: (playerId: string, league_id?: string, season_id?: string) =>
+    request<PlayerAnalytics>(`/analytics/players/${playerId}${scopeParams(league_id, season_id)}`),
+  getLeaderboard: (league_id?: string, season_id?: string) =>
+    request<LeaderboardEntry[]>(`/analytics/leaderboard${scopeParams(league_id, season_id)}`),
+  getPlayerShots: (playerId: string, league_id?: string, season_id?: string) =>
+    request<ShotAnalytics>(`/analytics/players/${playerId}/shots${scopeParams(league_id, season_id)}`),
+  getPlayerErrors: (playerId: string, league_id?: string, season_id?: string) =>
+    request<ErrorProneShotAnalytics>(`/analytics/players/${playerId}/errors${scopeParams(league_id, season_id)}`),
+  getPlayerShapley: (playerId: string, league_id?: string, season_id?: string) =>
+    request<ShapleyAnalytics>(`/analytics/players/${playerId}/shapley${scopeParams(league_id, season_id)}`),
 };
 
 /* --- Health API --- */

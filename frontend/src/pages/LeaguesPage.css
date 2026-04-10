@@ -1,0 +1,108 @@
+.leagues-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.leagues-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leagues-title {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.league-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+.league-form-players {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.league-player-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.leagues-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.league-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.league-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.league-card-name {
+  font-size: var(--font-size-base);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.league-card-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(88, 204, 2, 0.12);
+  color: var(--color-success);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.league-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.league-card-meta {
+  display: flex;
+  gap: var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+}
+
+.leagues-empty {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.leagues-empty-title {
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+}
+
+.leagues-empty-sub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  max-width: 260px;
+}

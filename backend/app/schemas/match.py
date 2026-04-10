@@ -14,8 +14,12 @@ class MatchCreate(BaseModel):
     team_b_player_ids: List[str]
     first_server_id: str
     tournament_id: Optional[str] = Field(None, description="Optional association with a tournament")
+    season_id: Optional[str] = Field(None, description="Optional association with a league season")
     tracking_level: str = Field("sequence", description="'summary' | 'sequence' | 'detailed'")
     match_format: str = Field("bo3", description="'bo1' (single game) | 'bo3' (best of 3)")
+    location_name: Optional[str] = Field(None, max_length=100, description="City or venue name")
+    latitude: Optional[float] = Field(None, ge=-90, le=90)
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
 
 class GameStateBase(BaseModel):
     game_number: int

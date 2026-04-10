@@ -8,15 +8,24 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding-bottom: 80px; /* space for fab */
+  padding-bottom: 80px;
 }
 
+/* ── Match card ── */
 .match-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   width: 100%;
   text-align: left;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 0 var(--color-border-strong);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.match-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--color-border-strong);
 }
 
 .match-card-header {
@@ -24,32 +33,41 @@
   justify-content: space-between;
   align-items: center;
   font-size: var(--font-size-xs);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-tertiary);
+  font-weight: 700;
   margin-bottom: var(--space-xs);
 }
 
 .match-badge {
-  font-weight: var(--font-weight-bold);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
+  font-weight: 800;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .match-badge--in_progress {
-  background: rgba(234, 67, 53, 0.15);
-  color: var(--color-error);
+  background: rgba(28, 176, 246, 0.12);
+  color: var(--color-primary);
+  border: 1.5px solid rgba(28, 176, 246, 0.3);
 }
 
 .match-badge--completed {
   background: var(--color-surface-active);
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
+  border: 1.5px solid var(--color-border);
 }
 
 .match-type {
-  font-weight: var(--font-weight-medium);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--font-size-xs);
 }
 
+/* ── Team rows ── */
 .team-row {
   display: flex;
   justify-content: space-between;
@@ -60,8 +78,8 @@
 }
 
 .team-winner .team-names {
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-light);
+  font-weight: 800;
+  color: var(--color-primary);
 }
 
 .team-names {
@@ -70,17 +88,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: var(--space-md);
+  font-weight: 600;
 }
 
 .team-score {
   font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
-  font-weight: var(--font-weight-bold);
+  font-weight: 900;
   font-size: var(--font-size-lg);
+  color: var(--color-text);
+  min-width: 28px;
+  text-align: right;
+}
+
+.team-winner .team-score {
+  color: var(--color-primary);
 }
 
 .team-divider {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
   text-transform: uppercase;
+  font-weight: 700;
   margin: 2px 0;
+  padding-left: 2px;
 }

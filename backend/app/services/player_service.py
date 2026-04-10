@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.player import Player
-from app.schemas.player import PlayerCreate, PlayerUpdate
+from app.schemas.player import PlayerCreate, PlayerUpdate, VALID_GENDERS, VALID_SKILL_LEVELS
 
 
 def normalize_phone(phone: str) -> str:
@@ -38,6 +38,11 @@ async def create_player(db: AsyncSession, data: PlayerCreate) -> Player:
     """Create a new player. Raises ValueError for duplicate phone."""
     normalized_phone = validate_phone(data.phone)
 
+    if data.gender is not None and data.gender not in VALID_GENDERS:
+        raise ValueError(f"Invalid gender. Must be one of: {', '.join(sorted(VALID_GENDERS))}")
+    if data.skill_level is not None and data.skill_level not in VALID_SKILL_LEVELS:
+        raise ValueError(f"Invalid skill_level. Must be one of: {', '.join(sorted(VALID_SKILL_LEVELS))}")
+
     # Check for duplicate
     existing = await db.execute(
         select(Player).where(Player.phone == normalized_phone)
@@ -45,7 +50,13 @@ async def create_player(db: AsyncSession, data: PlayerCreate) -> Player:
     if existing.scalar_one_or_none():
         raise ValueError("Phone number already registered")
 
-    player = Player(name=data.name, phone=normalized_phone)
+    player = Player(
+        name=data.name,
+        phone=normalized_phone,
+        age=data.age,
+        gender=data.gender,
+        skill_level=data.skill_level,
+    )
     db.add(player)
     await db.flush()
     await db.refresh(player)
@@ -74,8 +85,18 @@ async def update_player(
     player = await get_player_by_id(db, player_id)
     if not player:
         return None
+    if data.gender is not None and data.gender not in VALID_GENDERS:
+        raise ValueError(f"Invalid gender. Must be one of: {', '.join(sorted(VALID_GENDERS))}")
+    if data.skill_level is not None and data.skill_level not in VALID_SKILL_LEVELS:
+        raise ValueError(f"Invalid skill_level. Must be one of: {', '.join(sorted(VALID_SKILL_LEVELS))}")
     if data.name is not None:
         player.name = data.name
+    if data.age is not None:
+        player.age = data.age
+    if data.gender is not None:
+        player.gender = data.gender
+    if data.skill_level is not None:
+        player.skill_level = data.skill_level
     await db.flush()
     await db.refresh(player)
     return player

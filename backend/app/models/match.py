@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
-from sqlalchemy import String, Integer, DateTime, JSON, ForeignKey, Boolean
+from sqlalchemy import String, Integer, Float, DateTime, JSON, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
@@ -18,7 +18,11 @@ class Match(Base):
     current_game_number: Mapped[int] = mapped_column(Integer, default=1)
     winner_side: Mapped[Optional[str]] = mapped_column(String(10), nullable=True) # "a" or "b"
     tournament_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("tournaments.id"), nullable=True)
-    
+    season_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("seasons.id"), nullable=True)
+    location_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 
@@ -29,6 +33,7 @@ class Match(Base):
     games = relationship("GameResult", back_populates="match", cascade="all, delete-orphan", lazy="selectin")
     points = relationship("Point", back_populates="match", cascade="all, delete-orphan", lazy="selectin", order_by="Point.id")
     tournament = relationship("Tournament", back_populates="matches")
+    season = relationship("Season", back_populates="matches")
 
 class GameResult(Base):
     __tablename__ = "game_results"

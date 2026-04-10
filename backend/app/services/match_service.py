@@ -46,7 +46,11 @@ async def create_match(db: AsyncSession, data: MatchCreate) -> Match:
         team_a_player_ids=data.team_a_player_ids,
         team_b_player_ids=data.team_b_player_ids,
         current_game_number=1,
-        tournament_id=data.tournament_id
+        tournament_id=data.tournament_id,
+        season_id=data.season_id,
+        location_name=data.location_name,
+        latitude=data.latitude,
+        longitude=data.longitude,
     )
     
     # We will compute the game state dynamically based on Point records. 
@@ -82,10 +86,12 @@ async def get_match(db: AsyncSession, match_id: str) -> Optional[Match]:
     )
     return result.scalar_one_or_none()
 
-async def list_matches(db: AsyncSession, tournament_id: Optional[str] = None) -> List[Match]:
+async def list_matches(db: AsyncSession, tournament_id: Optional[str] = None, season_id: Optional[str] = None) -> List[Match]:
     query = select(Match).options(selectinload(Match.points), selectinload(Match.games)).order_by(Match.created_at.desc())
     if tournament_id:
         query = query.where(Match.tournament_id == tournament_id)
+    if season_id:
+        query = query.where(Match.season_id == season_id)
     result = await db.execute(query)
     return list(result.scalars().all())
 

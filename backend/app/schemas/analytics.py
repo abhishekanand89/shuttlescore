@@ -81,3 +81,40 @@ class LeaderboardEntry(BaseModel):
     losses: int
     win_rate: float
     avg_rally_duration_seconds: Optional[float] = None
+    elo_rating: int = 1500
+    shapley_value: Optional[float] = None
+
+
+class ErrorProneShot(BaseModel):
+    shot_type: str
+    label: str
+    error_count: int
+    total_count: int
+    error_rate: float
+
+
+class ErrorProneShotAnalytics(BaseModel):
+    total_error_points: int
+    shots: List[ErrorProneShot]
+
+
+class PartnershipSynergy(BaseModel):
+    partner_id: str
+    partner_name: str
+    matches_together: int
+    wins_together: int
+    pair_win_rate: float
+    expected_win_rate: float
+    synergy: float  # pair_win_rate - expected_win_rate
+
+
+class ShapleyAnalytics(BaseModel):
+    player_id: str
+    player_name: str
+    shapley_value: float
+    doubles_shapley: Optional[float]
+    singles_contribution: Optional[float]
+    doubles_matches: int
+    singles_matches: int
+    partnerships_analyzed: int
+    partnerships: List[PartnershipSynergy]

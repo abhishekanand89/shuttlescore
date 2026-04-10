@@ -1,0 +1,45 @@
+.league-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.ld-header { display: flex; flex-direction: column; gap: var(--space-xs); }
+.ld-title { font-size: var(--font-size-xl); font-weight: 900; letter-spacing: -0.5px; }
+.ld-desc { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+
+.ld-section { display: flex; flex-direction: column; gap: var(--space-sm); }
+.ld-section-header { display: flex; justify-content: space-between; align-items: center; }
+.ld-section-title { font-size: var(--font-size-sm); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); }
+
+.ld-player-list { display: flex; flex-direction: column; gap: 4px; }
+.ld-player-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: #fff; border: 2px solid var(--color-border); border-radius: var(--radius-md);
+}
+.ld-player-name { font-size: var(--font-size-sm); font-weight: 700; }
+.ld-remove-btn { color: var(--color-error); font-weight: 900; font-size: 18px; padding: 0 4px; }
+
+.ld-add-players { display: flex; flex-wrap: wrap; gap: var(--space-xs); padding-top: var(--space-xs); }
+.ld-empty-text { font-size: var(--font-size-sm); color: var(--color-text-tertiary); }
+
+.ld-season-form { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-md); }
+
+.ld-seasons-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.ld-season-card {
+  display: flex; flex-direction: column; gap: var(--space-xs);
+  padding: var(--space-md); cursor: pointer; text-align: left; width: 100%;
+}
+.ld-season-top { display: flex; justify-content: space-between; align-items: center; }
+.ld-season-name { font-size: var(--font-size-base); font-weight: 800; }
+.ld-season-status {
+  font-size: 10px; font-weight: 800; padding: 3px 10px;
+  border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.season-status--upcoming { background: rgba(28,176,246,0.1); color: var(--color-primary); }
+.season-status--active { background: rgba(88,204,2,0.12); color: var(--color-success); }
+.season-status--completed { background: rgba(0,0,0,0.06); color: var(--color-text-tertiary); }
+
+.ld-season-meta { font-size: var(--font-size-xs); color: var(--color-text-tertiary); font-weight: 600; display: flex; gap: var(--space-md); }
+.ld-action-btn { margin-top: var(--space-xs); align-self: flex-start; }
