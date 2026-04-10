@@ -1,6 +1,6 @@
 # shuttlescore
 Shuttle Score is a mobile-first web app for tracking badminton matches. You tap to score points live, and the app handles server rotation, game transitions, and match completion automatically.
-
+Demo Video: https://youtube.com/shorts/zqVYy6V-9x0?si=L6NisdQW3yneGT16
 Who uses it: Casual badminton groups and amateur league players who want something better than a whiteboard to track scores and see who's actually
 improving.
 
